@@ -36,9 +36,11 @@ from typing import Any, Dict, List, Optional, Tuple
 try:
     from . import __version__
     from .common import RANK_VALUE, assign_positions, parse_header, split_hand_history
+    from . import report_ui
 except ImportError:  # Supports direct execution during local debugging.
     __version__ = "1.1.0"
     from common import RANK_VALUE, assign_positions, parse_header, split_hand_history
+    import report_ui
 
 SEAT_RE = re.compile(r"Seat (\d+): (.+?) \(₮([0-9.]+) in chips\)")
 BUTTON_RE = re.compile(r"Seat #(\d+) is the button")
@@ -363,13 +365,7 @@ def html_escape(x: Any) -> str:
 
 
 def html_table(rows: List[Dict[str, Any]], cols: List[str], max_rows: int = 80) -> str:
-    if not rows:
-        return "<p><em>No rows.</em></p>"
-    out = ["<div class='table-wrap'><table>", "<thead><tr>" + "".join(f"<th>{html_escape(c)}</th>" for c in cols) + "</tr></thead>", "<tbody>"]
-    for r in rows[:max_rows]:
-        out.append("<tr>" + "".join(f"<td>{html_escape(r.get(c, ''))}</td>" for c in cols) + "</tr>")
-    out.append("</tbody></table></div>")
-    return "\n".join(out)
+    return report_ui.html_table(rows, cols, max_rows)
 
 
 def make_hand_class_summary(known_rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -382,16 +378,14 @@ def make_hand_class_summary(known_rows: List[Dict[str, Any]]) -> List[Dict[str, 
 
 
 def import_headless_pyplot():
-    """Load pyplot with a non-interactive backend suitable for CI and servers."""
-    import matplotlib
-
-    matplotlib.use("Agg", force=True)
-    import matplotlib.pyplot as plt
-
-    return plt
+    return report_ui.chart_pyplot()
 
 
 def generate_fourbet_charts(outdir: Path, summary_rows: List[Dict[str, Any]], known_rows: List[Dict[str, Any]]) -> List[str]:
+    return plot_fourbet_summary(outdir, summary_rows, make_hand_class_summary(known_rows))
+
+
+def plot_fourbet_summary(outdir: Path, summary_rows: List[Dict[str, Any]], classes: List[Dict[str, Any]]) -> List[str]:
     paths: List[str] = []
     try:
         plt = import_headless_pyplot()
@@ -403,21 +397,21 @@ def generate_fourbet_charts(outdir: Path, summary_rows: List[Dict[str, Any]], kn
     pos_rows = [r for r in summary_rows if r.get("fourbettor_position") != "ALL" and int(r.get("known_4bettor_hands") or 0) > 0]
     if pos_rows:
         pos_rows = sorted(pos_rows, key=lambda r: pct_float_text(r.get("AAxx_pct_of_known")), reverse=True)
-        labels = [str(r.get("fourbettor_position")) + f"\nn={r.get('known_4bettor_hands')}" for r in pos_rows]
+        labels = [f"{r.get('stake_label')} · {r.get('fourbettor_position')} · n={r.get('known_4bettor_hands')}" for r in pos_rows]
         vals = [pct_float_text(r.get("AAxx_pct_of_known")) for r in pos_rows]
-        fig, ax = plt.subplots(figsize=(9, 5))
-        ax.bar(labels, vals)
-        ax.set_ylim(0, max(100, max(vals) + 10 if vals else 100))
-        ax.set_ylabel("AAxx among known 4-bets (%)")
+        fig, ax = plt.subplots(figsize=(9, max(4, 0.38 * len(pos_rows))))
+        ax.barh(labels, vals)
+        ax.invert_yaxis()
+        ax.set_xlim(0, 100)
+        ax.set_xlabel("AAxx among known 4-bets (%)")
         ax.set_title("AAxx share by 4-bettor position")
-        ax.grid(axis="y", alpha=0.25)
+        ax.grid(axis="x", alpha=0.25)
         fig.tight_layout()
         path = chart_dir / "aaxx_by_position.png"
         fig.savefig(path, dpi=160)
         plt.close(fig)
         paths.append(str(path))
 
-    classes = make_hand_class_summary(known_rows)
     if classes:
         labels = [str(r.get("hand_class")) for r in classes]
         vals = [int(r.get("count") or 0) for r in classes]
@@ -437,53 +431,8 @@ def generate_fourbet_charts(outdir: Path, summary_rows: List[Dict[str, Any]], kn
 
 
 def generate_fourbet_dashboard(outdir: Path, summary_rows: List[Dict[str, Any]], rows: List[Dict[str, Any]], known_rows: List[Dict[str, Any]], chart_paths: List[str], args: argparse.Namespace) -> None:
-    known_aaxx = sum(1 for r in known_rows if r.get("is_aaxx") is True)
-    overall_pct = pct(known_aaxx, len(known_rows)) or "n/a"
-    cards = [
-        ("Stack-filtered 4-bets", f"{len(rows):,}"),
-        ("Known hands", f"{len(known_rows):,}"),
-        ("AAxx known", f"{known_aaxx:,}"),
-        ("AAxx % known", overall_pct),
-        ("Min stack", f"{args.min_stack_bb:g}bb"),
-        ("Stake filter", args.stake_filter or "all"),
-    ]
-    rel_charts = []
-    for p in chart_paths:
-        try:
-            rel_charts.append(Path(p).relative_to(outdir).as_posix())
-        except Exception:
-            rel_charts.append(Path(p).as_posix())
-    chart_html = "\n".join(f"<figure><img src='{html_escape(c)}' alt='{html_escape(Path(c).stem.replace('_',' '))}'><figcaption>{html_escape(Path(c).stem.replace('_',' ').title())}</figcaption></figure>" for c in rel_charts)
-    if not chart_html:
-        chart_html = "<p class='empty'>Charts were disabled for this run.</p>"
-    cols = ["stake_label", "fourbettor_position", "total_4bets_stack_filtered", "known_4bettor_hands", "known_rate_pct", "known_AAxx", "AAxx_pct_of_known", "unknown_4bettor_hands"]
-    class_rows = make_hand_class_summary(known_rows)
-    html_text = f"""<!doctype html>
-<html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>CoinPoker PLO Four-bet Showdown Analyzer</title>
-<style>
-:root {{ color-scheme:dark; --bg:#07100d; --panel:#0d1915; --panel2:#12221c; --text:#eef5ef; --muted:#9facaa; --border:#22352e; --green:#55d698; }}
-* {{ box-sizing:border-box; }} body {{ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(circle at 85% 0%,rgba(52,145,98,.13),transparent 30rem),var(--bg); color:var(--text); line-height:1.5; }}
-main {{ max-width:1220px; margin:0 auto; padding:clamp(20px,4vw,52px); }} .eyebrow {{ color:var(--green); font-size:12px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }}
-h1 {{ margin:12px 0 8px; font-size:clamp(38px,6vw,64px); line-height:1; letter-spacing:-.055em; }} h2 {{ margin:48px 0 18px; font-size:clamp(24px,3vw,32px); letter-spacing:-.035em; }}
-.subtitle,.note,.empty {{ color:var(--muted); }} .subtitle {{ max-width:780px; font-size:17px; }}
-.cards {{ display:grid; grid-template-columns:repeat(6,1fr); gap:1px; margin:34px 0 12px; overflow:hidden; border:1px solid var(--border); border-radius:16px; background:var(--border); }}
-.card {{ background:rgba(13,25,21,.97); padding:20px; }} .card .label {{ color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.09em; }} .card .value {{ font-size:24px; font-weight:760; letter-spacing:-.035em; margin-top:7px; }}
-.grid {{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }} figure {{ background:linear-gradient(145deg,var(--panel2),var(--panel)); border:1px solid var(--border); border-radius:16px; padding:12px; margin:0; }} img {{ max-width:100%; display:block; border-radius:10px; background:#fff; }} figcaption {{ color:var(--muted); font-size:12px; margin:9px 4px 3px; }}
-.table-wrap {{ width:100%; overflow:auto; border:1px solid var(--border); border-radius:14px; }} table {{ border-collapse:collapse; width:100%; min-width:780px; font-size:12px; background:var(--panel); }} th,td {{ border-bottom:1px solid var(--border); padding:9px 11px; }} th {{ text-align:left; background:#162820; white-space:nowrap; }} tr:last-child td {{ border-bottom:0; }} tr:hover td {{ background:#10221b; }}
-.note {{ margin-top:22px; padding:20px; border:1px solid var(--border); border-radius:14px; background:var(--panel); }}
-@media(max-width:960px) {{ .cards {{ grid-template-columns:repeat(3,1fr); }} }} @media(max-width:720px) {{ .grid {{ grid-template-columns:1fr; }} .cards {{ grid-template-columns:repeat(2,1fr); }} }} @media(max-width:440px) {{ .cards {{ grid-template-columns:1fr; }} }}
-</style></head><body><main>
-<div class='eyebrow'>Conditional showdown sample</div>
-<h1>CoinPoker PLO Four-bet Analyzer</h1>
-<p class='subtitle'>Population-level composition of known/shown four-bet hands. Unknown cards stay visible in coverage counts and are excluded from hand-class denominators.</p>
-<section class='cards'>{''.join(f"<div class='card'><div class='label'>{html_escape(k)}</div><div class='value'>{html_escape(v)}</div></div>" for k,v in cards)}</section>
-<h2>Composition overview</h2><div class='grid'>{chart_html}</div>
-<h2>Position summary</h2>{html_table(summary_rows, cols, max_rows=80)}
-<h2>Known hand classes</h2>{html_table(class_rows, ['hand_class','count','pct'], max_rows=20)}
-<p class='note'>A four-bet is the third preflop raise. ALLIN counts only when it increases the amount to call. Hero is excluded by default. Showdown composition is conditional on cards being revealed and can be affected by selection bias.</p>
-</main></body></html>"""
-    (outdir / "fourbet_dashboard.html").write_text(html_text, encoding="utf-8")
-    (outdir / "fourbet_report.html").write_text(html_text, encoding="utf-8")
+    report_ui.fourbet_report(outdir, summary_rows, make_hand_class_summary(known_rows),
+                            chart_paths, args.min_stack_bb, args.stake_filter)
 
 
 def pct(num: int, den: int) -> str:

@@ -39,9 +39,11 @@ from typing import Any, Dict, List, Optional, Tuple
 try:
     from . import __version__
     from .common import RANK_VALUE, assign_positions, parse_header, split_hand_history
+    from . import report_ui
 except ImportError:  # Supports direct execution during local debugging.
     __version__ = "1.1.0"
     from common import RANK_VALUE, assign_positions, parse_header, split_hand_history
+    import report_ui
 
 MONEY_RE = re.compile(r"₮([0-9]+(?:\.[0-9]+)?)")
 
@@ -1401,14 +1403,7 @@ def html_escape(x: Any) -> str:
 
 
 def html_table(rows: List[Dict[str, Any]], cols: List[str], max_rows: int = 50) -> str:
-    if not rows:
-        return "<p><em>No rows.</em></p>"
-    out = ["<div class='table-wrap'><table>", "<thead><tr>" + "".join(f"<th>{html_escape(c)}</th>" for c in cols) + "</tr></thead>", "<tbody>"]
-    for r in rows[:max_rows]:
-        cls = str(r.get("benchmark_flag", "")).lower()
-        out.append(f"<tr class='{html_escape(cls)}'>" + "".join(f"<td>{html_escape(r.get(c, ''))}</td>" for c in cols) + "</tr>")
-    out.append("</tbody></table></div>")
-    return "\n".join(out)
+    return report_ui.html_table(rows, cols, max_rows)
 
 
 def write_default_benchmarks(path: Path) -> None:
@@ -1582,13 +1577,7 @@ def markdown_table(rows: List[Dict[str, Any]], cols: List[str], max_rows: int = 
 
 
 def import_headless_pyplot():
-    """Load pyplot with a non-interactive backend suitable for CI and servers."""
-    import matplotlib
-
-    matplotlib.use("Agg", force=True)
-    import matplotlib.pyplot as plt
-
-    return plt
+    return report_ui.chart_pyplot()
 
 
 def plot_key_leaks(summary: List[Dict[str, Any]], benchmarks: Dict[str, Dict[str, Any]], outdir: Path, min_sample: int, max_rows: int = 12) -> List[str]:
@@ -1601,7 +1590,7 @@ def plot_key_leaks(summary: List[Dict[str, Any]], benchmarks: Dict[str, Dict[str
     leaks = sorted(leaks, key=lambda r: float(r.get("exploit_score") or 0.0), reverse=True)[:max_rows]
     if not leaks:
         return paths
-    labels = [f"{r.get('spot_id')}\n{r.get('pot_type')} n={r.get('opportunities')}" for r in leaks]
+    labels = [report_ui.chart_label(r) for r in leaks]
     values = []
     lows = []
     highs = []
@@ -1615,7 +1604,7 @@ def plot_key_leaks(summary: List[Dict[str, Any]], benchmarks: Dict[str, Dict[str
     y = list(range(len(labels)))
     ax.barh(y, values)
     for i, (lo, hi) in enumerate(zip(lows, highs)):
-        ax.plot([lo, hi], [i, i], linewidth=5, alpha=0.35)
+        ax.plot([lo, hi], [i, i], color="#e8b16a", linewidth=5, alpha=0.8)
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
     ax.invert_yaxis()
@@ -1645,31 +1634,38 @@ def plot_spot_pottype_heatmap(summary: List[Dict[str, Any]], outdir: Path, min_s
     ]
     if not rows:
         return paths
-    # Keep the most useful spots by total sample.
-    sample_by_spot: Dict[str, int] = collections.Counter()
-    for r in rows:
-        sample_by_spot[str(r.get("spot_id", ""))] += int(r.get("opportunities") or 0)
-    spots = [s for s, _ in sample_by_spot.most_common(14)]
+    # Keep each stake visible instead of labeling several limits as one cell.
+    sample_by_node = collections.Counter()
+    for row in rows:
+        sample_by_node[(str(row.get("spot_id", "")), str(row.get("stake_label", "")))] += int(row.get("opportunities") or 0)
+    nodes = [key for key, _ in sample_by_node.most_common(14)]
     pot_types = [p for p in ["srp", "3bet", "4bet+", "limped"] if any(r.get("pot_type") == p for r in rows)]
-    if not spots or not pot_types:
+    if not nodes or not pot_types:
         return paths
-    mat = np.full((len(spots), len(pot_types)), np.nan)
-    for i, spot in enumerate(spots):
-        for j, pt in enumerate(pot_types):
-            match = [r for r in rows if r.get("spot_id") == spot and r.get("pot_type") == pt]
-            if match:
-                mat[i, j] = float(match[0].get("deviation_pp") or 0.0)
-    fig, ax = plt.subplots(figsize=(9, max(5, 0.45 * len(spots))))
-    im = ax.imshow(mat, aspect="auto")
+    lookup = {(r.get("spot_id"), r.get("stake_label"), r.get("pot_type")): r for r in rows}
+    mat = np.full((len(nodes), len(pot_types)), np.nan)
+    labels = []
+    for i, (spot, stake) in enumerate(nodes):
+        example = next(r for r in rows if r.get("spot_id") == spot and r.get("stake_label") == stake)
+        labels.append(f"{report_ui.node_name(example)} · {stake}")
+        for j, pot in enumerate(pot_types):
+            row = lookup.get((spot, stake, pot))
+            if row:
+                mat[i, j] = float(row.get("deviation_pp") or 0.0)
+    from matplotlib.colors import LinearSegmentedColormap
+    colors = LinearSegmentedColormap.from_list("review", ["#4c86b0", "#303b44", "#bc8c50"])
+    limit = max(1.0, float(np.nanmax(np.abs(mat))))
+    fig, ax = plt.subplots(figsize=(11, max(5, 0.42 * len(nodes))))
+    im = ax.imshow(mat, aspect="auto", cmap=colors, vmin=-limit, vmax=limit)
     ax.set_xticks(range(len(pot_types)))
-    ax.set_xticklabels(pot_types)
-    ax.set_yticks(range(len(spots)))
-    ax.set_yticklabels(spots, fontsize=8)
-    ax.set_title("Deviation from benchmark by spot and pot type (pp)")
-    for i in range(len(spots)):
+    ax.set_xticklabels([report_ui.POTS.get(p, p) for p in pot_types])
+    ax.set_yticks(range(len(nodes)))
+    ax.set_yticklabels(labels, fontsize=8)
+    ax.set_title("Deviation from review band by stake and pot type")
+    for i in range(len(nodes)):
         for j in range(len(pot_types)):
             if not math.isnan(float(mat[i, j])):
-                ax.text(j, i, f"{mat[i, j]:.1f}", ha="center", va="center", fontsize=8)
+                ax.text(j, i, f"{mat[i, j]:+.1f}", ha="center", va="center", fontsize=8, color="#f4f5f5")
     fig.colorbar(im, ax=ax, label="percentage-point deviation")
     fig.tight_layout()
     path = outdir / "charts" / "spot_pottype_heatmap.png"
@@ -1698,7 +1694,7 @@ def plot_action_mix(summary: List[Dict[str, Any]], outdir: Path, spot_ids: Optio
     rows = sorted(rows, key=lambda r: (str(r.get("spot_id")), str(r.get("pot_type"))))[:18]
     if not rows:
         return paths
-    labels = [f"{r.get('spot_id')}\n{r.get('pot_type')} n={r.get('opportunities')}" for r in rows]
+    labels = [report_ui.chart_label(r) for r in rows]
     fold = [float(r.get("fold_pct") or 0) for r in rows]
     call = [float(r.get("call_pct") or 0) for r in rows]
     raise_ = [float(r.get("raise_pct") or 0) for r in rows]
@@ -1707,7 +1703,7 @@ def plot_action_mix(summary: List[Dict[str, Any]], outdir: Path, spot_ids: Optio
     ax.barh(y, fold, label="fold")
     ax.barh(y, call, left=fold, label="call")
     left2 = [a + b for a, b in zip(fold, call)]
-    ax.barh(y, raise_, left=left2, label="raise/all-in")
+    ax.barh(y, raise_, left=left2, label="raise")
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
     ax.invert_yaxis()
@@ -1747,12 +1743,12 @@ def plot_board_texture_heatmap(board_summary: List[Dict[str, Any]], benchmarks: 
             if match:
                 mat[i, j] = pct_float(match[0].get(metric, ""))
     fig, ax = plt.subplots(figsize=(8, max(4, 0.5 * len(boards))))
-    im = ax.imshow(mat, aspect="auto")
+    im = ax.imshow(mat, aspect="auto", cmap="cividis")
     ax.set_xticks(range(len(pots)))
-    ax.set_xticklabels(pots)
+    ax.set_xticklabels([report_ui.POTS.get(p, p) for p in pots])
     ax.set_yticks(range(len(boards)))
     ax.set_yticklabels(boards)
-    ax.set_title(f"{spot_id}: {metric} by board texture")
+    ax.set_title(f"{report_ui.metric_name(metric)} by board texture")
     for i in range(len(boards)):
         for j in range(len(pots)):
             if not math.isnan(float(mat[i, j])):
@@ -1777,80 +1773,7 @@ def generate_pool_charts(outdir: Path, summary: List[Dict[str, Any]], board_summ
 
 
 def generate_dashboard_html(outdir: Path, filters: Dict[str, Any], summary: List[Dict[str, Any]], leak_rows: List[Dict[str, Any]], chart_paths: List[str]) -> None:
-    top_cols = ["spot_id", "pot_type", "opportunities", "benchmark_metric", "deviation_pp", "exploit_score", "confidence", "benchmark_flag", "leak_note"]
-    summary_cols = ["spot_id", "pot_type", "opportunities", "bet_pct", "check_pct", "fold_pct", "call_pct", "raise_pct", "avg_size_pct", "benchmark_flag", "confidence", "exploit_score"]
-    rel_charts = []
-    for p in chart_paths:
-        try:
-            rel_charts.append(Path(p).relative_to(outdir).as_posix())
-        except Exception:
-            rel_charts.append(Path(p).as_posix())
-    def display_value(value: Any) -> str:
-        return f"{value:,}" if isinstance(value, int) else str(value)
-
-    cards = [
-        ("Hands analyzed", display_value(filters.get("hands_analyzed_after_filters", ""))),
-        ("Decision nodes", display_value(filters.get("pool_spot_records", ""))),
-        ("Stake filter", filters.get("stake_filter", "")),
-        ("Parse errors", display_value(filters.get("parse_errors", ""))),
-        ("Hero included", "yes" if filters.get("include_hero_as_population_actor") else "no"),
-        ("Game", str(filters.get("game_filter", "")).upper()),
-    ]
-    chart_html = "\n".join(f"<figure><img src='{html_escape(c)}' alt='{html_escape(Path(c).stem.replace('_',' '))}'><figcaption>{html_escape(Path(c).stem.replace('_',' ').title())}</figcaption></figure>" for c in rel_charts)
-    if not chart_html:
-        chart_html = "<p class='empty'>Charts were disabled for this run.</p>"
-    html_text = f"""<!doctype html>
-<html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>CoinPoker PLO Population Analyzer — Review Dashboard</title>
-<style>
-:root {{ color-scheme:dark; --bg:#07100d; --panel:#0d1915; --panel2:#12221c; --text:#eef5ef; --muted:#9facaa; --border:#22352e; --green:#55d698; --amber:#efb85c; --red:#f27c6f; }}
-* {{ box-sizing:border-box; }}
-body {{ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(circle at 85% 0%,rgba(52,145,98,.13),transparent 30rem),var(--bg); color:var(--text); line-height:1.5; }}
-main {{ max-width:1320px; margin:0 auto; padding:clamp(20px,4vw,52px); }}
-.eyebrow {{ color:var(--green); font-size:12px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }}
-h1 {{ margin:12px 0 8px; max-width:800px; font-size:clamp(38px,6vw,68px); line-height:1; letter-spacing:-.055em; }}
-h2 {{ margin:52px 0 18px; font-size:clamp(24px,3vw,34px); letter-spacing:-.035em; }}
-.subtitle {{ max-width:760px; color:var(--muted); margin:0 0 30px; font-size:17px; }}
-.cards {{ display:grid; grid-template-columns:repeat(6,1fr); gap:1px; margin:34px 0 12px; overflow:hidden; border:1px solid var(--border); border-radius:16px; background:var(--border); }}
-.card {{ background:rgba(13,25,21,.97); padding:20px; }}
-.card .label {{ color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.09em; }}
-.card .value {{ font-size:24px; font-weight:760; letter-spacing:-.035em; margin-top:7px; }}
-.grid {{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }}
-figure {{ background:linear-gradient(145deg,var(--panel2),var(--panel)); border:1px solid var(--border); border-radius:16px; padding:12px; margin:0; }}
-figcaption {{ color:var(--muted); font-size:12px; margin:9px 4px 3px; }}
-img {{ max-width:100%; height:auto; display:block; border-radius:10px; background:#fff; }}
-.table-wrap {{ width:100%; overflow:auto; border:1px solid var(--border); border-radius:14px; }}
-table {{ border-collapse:collapse; width:100%; min-width:900px; font-size:12px; background:var(--panel); }}
-th,td {{ border-bottom:1px solid var(--border); padding:9px 11px; vertical-align:top; }}
-th {{ text-align:left; color:#dce8e1; background:#162820; position:sticky; top:0; white-space:nowrap; }}
-tr:last-child td {{ border-bottom:0; }} tr:hover td {{ background:#10221b; }}
-tr.low td, tr.high td {{ font-weight:640; }} tr.low td:first-child, tr.high td:first-child {{ border-left:3px solid var(--amber); }}
-tr.audit_required td:first-child {{ border-left:3px solid var(--red); }}
-.method {{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px; }}
-.note {{ margin:0; padding:20px; color:var(--muted); border:1px solid var(--border); border-radius:14px; background:var(--panel); }}
-.note strong {{ color:var(--text); }} .empty {{ color:var(--muted); }}
-.code {{ font-family:ui-monospace,Consolas,monospace; }}
-a {{ color:var(--green); }}
-@media(max-width:1000px) {{ .cards {{ grid-template-columns:repeat(3,1fr); }} }}
-@media(max-width:760px) {{ .grid,.method {{ grid-template-columns:1fr; }} .cards {{ grid-template-columns:repeat(2,1fr); }} }}
-@media(max-width:460px) {{ .cards {{ grid-template-columns:1fr; }} }}
-</style></head><body><main>
-<div class='eyebrow'>Aggregate review dashboard</div>
-<h1>CoinPoker PLO Population Analyzer</h1>
-<p class='subtitle'>Privacy-conscious analysis of anonymized hand histories. Frequencies are grouped at population level; no per-player profiles are created.</p>
-<section class='cards'>
-{''.join(f"<div class='card'><div class='label'>{html_escape(k)}</div><div class='value'>{html_escape(v)}</div></div>" for k,v in cards)}
-</section>
-<h2>Priority review candidates</h2>
-{html_table(leak_rows, top_cols, max_rows=12)}
-<h2>Pattern overview</h2>
-<div class='grid'>{chart_html}</div>
-<h2>All decision nodes</h2>
-{html_table(summary, summary_cols, max_rows=160)}
-<h2>How to read this report</h2>
-<div class='method'><p class='note'><strong>Review bands, not ground truth.</strong><br>LOW and HIGH mark observations outside configurable practical bands. <span class='code'>audit_required</span> suppresses interpretation when a definition remains unresolved. These labels are not solver outputs or automatic strategy changes.</p>
-<p class='note'><strong>Traceable by design.</strong><br>The local report folder also contains exact filters, benchmark definitions, aggregate splits and <span class='code'>pool_spots.csv</span> for source-hand review. Never publish granular files from real data without a privacy review.</p></div>
-</main></body></html>"""
-    (outdir / "pool_dashboard.html").write_text(html_text, encoding="utf-8")
+    report_ui.pool_report(outdir, filters, summary, leak_rows, chart_paths)
 
 
 def write_stake_comparison(comparison_rows: List[Dict[str, Any]], outdir: Path, stakes: List[str]) -> None:

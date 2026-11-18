@@ -2,11 +2,11 @@
 
 CoinPoker-specific, privacy-conscious population analysis for Pot-Limit Omaha hand histories.
 
-[View the case study](docs/index.html) · [Open the population dashboard](docs/demo/pool_dashboard.html) · [Open the four-bet dashboard](docs/demo/fourbet_dashboard.html) · [Read the methodology](docs/METHODOLOGY.md)
+[Open the overview](docs/index.html) · [Open the population dashboard](docs/demo/pool_dashboard.html) · [Open the four-bet dashboard](docs/demo/fourbet_dashboard.html) · [Read the methodology](docs/methodology.html)
 
 ## Preview — no setup required
 
-On Windows, extract the repository and double-click **`START.bat`**. It opens the complete case study and its aggregate dashboards in the default browser. Python, a terminal and access to private hand histories are not required for the preview.
+On Windows, extract the repository and double-click **`START.bat`**. It opens the overview and aggregate reports in the default browser. Python, a terminal and access to private hand histories are not required for the preview.
 
 The installation commands below are only for analysts who want to process their own CoinPoker exports.
 

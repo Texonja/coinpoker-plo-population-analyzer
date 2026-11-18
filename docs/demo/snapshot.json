@@ -1,0 +1,75 @@
+{
+  "filters": {
+    "raw_hands_before_filters": 38248,
+    "hands_analyzed_after_filters": 27701,
+    "pool_spot_records": 19527,
+    "parse_errors": 0,
+    "game_filter": "plo4",
+    "stake_filter": "all",
+    "include_hero_as_population_actor": false
+  },
+  "fourbet_min_stack_bb": 60,
+  "fourbet_classes": [
+    {
+      "hand_class": "AAxx",
+      "count": "172",
+      "pct": "58.9%"
+    },
+    {
+      "hand_class": "KKxx",
+      "count": "30",
+      "pct": "10.3%"
+    },
+    {
+      "hand_class": "broadway",
+      "count": "25",
+      "pct": "8.6%"
+    },
+    {
+      "hand_class": "pair",
+      "count": "24",
+      "pct": "8.2%"
+    },
+    {
+      "hand_class": "suited_ace",
+      "count": "19",
+      "pct": "6.5%"
+    },
+    {
+      "hand_class": "other",
+      "count": "13",
+      "pct": "4.5%"
+    },
+    {
+      "hand_class": "rundown",
+      "count": "9",
+      "pct": "3.1%"
+    }
+  ],
+  "board_chart": {
+    "source": "Values transcribed from the original committed board_texture_oop_response_vs_ip_flop_stab_after_missed_cb.png; the original snapshot omits per-cell sample counts and stakes.",
+    "rows": [
+      "dry",
+      "high",
+      "paired"
+    ],
+    "columns": [
+      "srp",
+      "3bet"
+    ],
+    "values": [
+      [
+        50.0,
+        36.9
+      ],
+      [
+        43.2,
+        null
+      ],
+      [
+        41.0,
+        null
+      ]
+    ]
+  }
+}
