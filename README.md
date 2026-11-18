@@ -39,7 +39,7 @@ Open `pool_dashboard.html` or `fourbet_dashboard.html` in the output folder. The
 
 ## Scope and tests
 
-The default analysis covers regular PLO4 hands and excludes Hero's own decisions. PLO5, bomb pots and straddles need separate validation. The review thresholds are configurable and meant for finding spots worth a closer look.
+The default analysis covers regular PLO4 hands and excludes Hero's own decisions. PLO5, bomb pots and straddles need separate validation. The reference ranges are configurable and help you find spots worth a closer look.
 
 ```bash
 python -m unittest discover -s tests -v

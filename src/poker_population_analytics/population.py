@@ -1357,10 +1357,10 @@ def benchmark_flag(row: Dict[str, Any], benchmarks: Dict[str, Dict[str, Any]], m
     low = float(b.get("low", 0.0))
     high = float(b.get("high", 100.0))
     if v < low:
-        return "LOW", str(b.get("low_note", "below benchmark band"))
+        return "LOW", str(b.get("low_note", "Below reference range"))
     if v > high:
-        return "HIGH", str(b.get("high_note", "above benchmark band"))
-    return "OK", "inside benchmark band"
+        return "HIGH", str(b.get("high_note", "Above reference range"))
+    return "OK", "Within reference range"
 
 
 def confidence_label(n: int) -> str:
@@ -1608,8 +1608,8 @@ def plot_key_leaks(summary: List[Dict[str, Any]], benchmarks: Dict[str, Dict[str
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
     ax.invert_yaxis()
-    ax.set_xlabel("Observed %; thick segment = benchmark band")
-    ax.set_title("Top benchmark deviations")
+    ax.set_xlabel("Observed % (thick line = reference range)")
+    ax.set_title("Largest gaps from the reference range")
     ax.grid(axis="x", alpha=0.25)
     fig.tight_layout()
     path = outdir / "charts" / "key_leaks.png"
@@ -1661,7 +1661,7 @@ def plot_spot_pottype_heatmap(summary: List[Dict[str, Any]], outdir: Path, min_s
     ax.set_xticklabels([report_ui.POTS.get(p, p) for p in pot_types])
     ax.set_yticks(range(len(nodes)))
     ax.set_yticklabels(labels, fontsize=8)
-    ax.set_title("Deviation from review band by stake and pot type")
+    ax.set_title("Deviation from the reference range by stake and pot type")
     for i in range(len(nodes)):
         for j in range(len(pot_types)):
             if not math.isnan(float(mat[i, j])):
@@ -1965,7 +1965,7 @@ def analyze_pool(input_path: Path, outdir: Path, args: argparse.Namespace) -> Di
     md.append("")
     md.append("CoinPoker export uses anonymized player IDs, so this report intentionally does **population-only aggregation**. It does not create per-player profiles and it does not try to track individual opponents across sessions.")
     md.append("")
-    md.append("Benchmark bands are practical review bands, not solver truth. Use the flags as exploit candidates, then inspect `pool_spots.csv` and the hand IDs before changing strategy aggressively.")
+    md.append("Reference ranges come from the configuration. Check the source hands in `pool_spots.csv` before drawing strategy conclusions from a flagged result.")
     md.append("")
     md.append("## v2 added nodes")
     md.append("")
@@ -1977,8 +1977,8 @@ def analyze_pool(input_path: Path, outdir: Path, args: argparse.Namespace) -> Di
         for i, r in enumerate(leak_rows[:20], start=1):
             b = benchmarks.get(r.get("spot_id", ""), {})
             metric = b.get("metric", "")
-            band = f"{b.get('low')}–{b.get('high')}%"
-            md.append(f"{i}. **{r.get('spot_id')}** / {r.get('stake_label')} / {r.get('pot_type')}: {metric} = **{r.get(metric)}%**, benchmark band **{band}**, sample **{r.get('opportunities')}**. {r.get('leak_note')}")
+            reference = report_ui.reference_range(r)
+            md.append(f"{i}. **{r.get('spot_id')}** / {r.get('stake_label')} / {r.get('pot_type')} shows **{r.get(metric)}%** for {metric} against a reference range of **{reference}** (sample **{r.get('opportunities')}**). {r.get('leak_note')}")
             md.append("")
     else:
         md.append(f"No spot reached min sample {args.min_sample} with a benchmark deviation. Lower `--min-sample`, widen filters, or use a larger HH file.")
@@ -1996,7 +1996,7 @@ def analyze_pool(input_path: Path, outdir: Path, args: argparse.Namespace) -> Di
     md.append("- `pool_summary_by_position.csv` — same stats split by position and board texture")
     md.append("- `pool_summary_by_ip_oop.csv` — compact split by actor IP/OOP, useful for delayed c-bet and c-bet response nodes")
     md.append("- `pool_spots.csv` — individual anonymized spot records, with hand IDs for review")
-    md.append("- `benchmarks_used.json` — benchmark bands used for leak flags")
+    md.append("- `benchmarks_used.json` — configured reference ranges used in the report")
     md.append("- `filters_applied.json` — exact filters and parse counts")
     if getattr(args, "audit_flop_cbet", False):
         md.append("- `audit_fold_to_flop_cbet.csv` — opt-in local audit of every analyzed hand, including explicit denominator inclusion/exclusion reasons")

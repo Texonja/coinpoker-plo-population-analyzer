@@ -8,7 +8,7 @@
 <div class="metrics"><div class="metric"><strong>38,248</strong><span>Raw hands</span></div><div class="metric"><strong>27,701</strong><span>Included hands</span></div><div class="metric"><strong>0</strong><span>Parse errors</span></div></div></div>
 <nav class="tabs" aria-label="Report navigation"><a href="index.html">Overview</a><a href="demo/pool_dashboard.html">Population</a><a href="demo/fourbet_dashboard.html">Four-bet</a><a href="methodology.html" aria-current=page>Methodology</a><span class="tab-end">Snapshot definitions</span></nav>
 </header><main id="overview"><div class="page-heading"><div><h1>Methodology</h1><p>Definitions, sample coverage and current validation status.</p></div></div>
-<div class="method-grid"><aside class="panel method-menu"><a href="#definitions">Definitions</a><a href="#processing">Processing</a><a href="#review">Review bands</a><a href="#audit">C-bet audit</a><a href="#fourbet">Four-bet sample</a><a href="#limits">Data & limitations</a></aside><div class="method-content"><section class="panel" id="definitions"><h2>Definitions</h2><dl class="definitions">
+<div class="method-grid"><aside class="panel method-menu"><a href="#definitions">Definitions</a><a href="#processing">Processing</a><a href="#review">Reference ranges</a><a href="#audit">C-bet audit</a><a href="#fourbet">Four-bet sample</a><a href="#limits">Data & limitations</a></aside><div class="method-content"><section class="panel" id="definitions"><h2>Definitions</h2><dl class="definitions">
 <dt>Opportunity</dt><dd>A hand state where the tracked player can take one of the actions defined for a decision node. Action percentages use this count as their denominator.</dd>
 <dt>Bet size</dt><dd>Average size is measured as a percentage of the pot before the action. Facing size measures the bet presented to the responder.</dd>
 <dt>Pot type</dt><dd>Preflop raise count determines limped, single-raised, three-bet and four-bet-or-larger pots.</dd>
@@ -18,12 +18,12 @@
 <p>The parser extracts seats, positions, stacks, board cards and ordered actions. It reconstructs pot sizes and betting sequences, identifies qualifying decision opportunities, then groups them by stake and pot type.</p>
 <p>An ALLIN action is classified by whether it increases the amount to call. Preflop all-in raises update the aggressor and pot type. Straddled hands are detected and excluded by default.</p>
 <p>Each local run saves its filters, benchmark definitions and aggregate splits. Hand-level records retain the source actions for manual validation.</p></section>
-<section class="panel" id="review"><h2>Review bands</h2>
-<dl class="definitions"><dt>Below band / Above band</dt><dd>The observed metric is outside its configured range and meets the minimum sample requirement.</dd>
-<dt>In band</dt><dd>The metric falls within its configured range.</dd>
+<section class="panel" id="review"><h2>Reference ranges</h2>
+<dl class="definitions"><dt>Below range / Above range</dt><dd>The observed rate falls outside the reference range and the sample meets the reporting threshold.</dd>
+<dt>Within range</dt><dd>The observed rate falls within the reference range, including its endpoints.</dd>
 <dt>Low sample</dt><dd>The count is below the reporting threshold.</dd>
 <dt>Audit required</dt><dd>A definition or comparison remains unresolved. Deviation and review score are set to zero.</dd>
-</dl><p>Review bands are analyst-configured ranges. The review score combines distance from the band with a coarse sample-size weight. Probability, expected value and uncertainty intervals are outside this calculation.</p></section>
+</dl><p>The reference ranges come from the configuration. The review score weights the distance from the range by sample size. Probability, expected value and uncertainty intervals are outside this calculation.</p></section>
 <section class="panel notice" id="audit"><h2>Fold-to-flop-c-bet audit</h2>
 <p>The node requires a known preflop aggressor, a heads-up flop, the aggressor’s first bet without a donk lead, and a subsequent fold, call or raise from the defender. Missing actions and excluded situations receive reason codes in the local audit.</p>
 <p>The PL50 snapshot shows 44.6% folds in single-raised pots (2,102 opportunities) and 43.2% in three-bet pots (837 opportunities). The comparison CoinPoker HUD displays roughly 25–39%.</p>

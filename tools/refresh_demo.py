@@ -29,11 +29,11 @@ def overview(summary, filters):
             and row["benchmark_flag"] in {"LOW", "HIGH"} and int(row["opportunities"]) >= 30]
     pl50.sort(key=lambda row: int(row["opportunities"]), reverse=True)
     shown = pl50[:8]
-    cols = ["spot_id", "pot_type", "opportunities", "observed", "benchmark_flag"]
+    cols = ["spot_id", "pot_type", "opportunities", "observed", "reference_range", "benchmark_flag"]
     grid = '<div class="overview-grid">'
     grid += ui.panel("PL50 · review nodes", ui.html_table(shown, cols, selectable=True, compact=True),
                      '<a href="demo/pool_dashboard.html">All stakes →</a>',
-                     '<p class="panel-note">Observed % follows each node’s review metric. Select a row for details.</p>')
+                     '<p class="panel-note">Select a row to see which action the observed rate and reference range measure.</p>')
     grid += ui.node_detail(shown[0]) + "</div>"
     grid += '<div class="summary-grid">'
     grid += ui.panel("Four-bet sample", """<div class="highlight"><div class="small">Known / shown hands</div>
@@ -53,7 +53,7 @@ def overview(summary, filters):
 
 
 def methodology():
-    menu = [("definitions", "Definitions"), ("processing", "Processing"), ("review", "Review bands"),
+    menu = [("definitions", "Definitions"), ("processing", "Processing"), ("review", "Reference ranges"),
             ("audit", "C-bet audit"), ("fourbet", "Four-bet sample"), ("limits", "Data & limitations")]
     content = """<section class="panel" id="definitions"><h2>Definitions</h2><dl class="definitions">
 <dt>Opportunity</dt><dd>A hand state where the tracked player can take one of the actions defined for a decision node. Action percentages use this count as their denominator.</dd>
@@ -65,12 +65,12 @@ def methodology():
 <p>The parser extracts seats, positions, stacks, board cards and ordered actions. It reconstructs pot sizes and betting sequences, identifies qualifying decision opportunities, then groups them by stake and pot type.</p>
 <p>An ALLIN action is classified by whether it increases the amount to call. Preflop all-in raises update the aggressor and pot type. Straddled hands are detected and excluded by default.</p>
 <p>Each local run saves its filters, benchmark definitions and aggregate splits. Hand-level records retain the source actions for manual validation.</p></section>
-<section class="panel" id="review"><h2>Review bands</h2>
-<dl class="definitions"><dt>Below band / Above band</dt><dd>The observed metric is outside its configured range and meets the minimum sample requirement.</dd>
-<dt>In band</dt><dd>The metric falls within its configured range.</dd>
+<section class="panel" id="review"><h2>Reference ranges</h2>
+<dl class="definitions"><dt>Below range / Above range</dt><dd>The observed rate falls outside the reference range and the sample meets the reporting threshold.</dd>
+<dt>Within range</dt><dd>The observed rate falls within the reference range, including its endpoints.</dd>
 <dt>Low sample</dt><dd>The count is below the reporting threshold.</dd>
 <dt>Audit required</dt><dd>A definition or comparison remains unresolved. Deviation and review score are set to zero.</dd>
-</dl><p>Review bands are analyst-configured ranges. The review score combines distance from the band with a coarse sample-size weight. Probability, expected value and uncertainty intervals are outside this calculation.</p></section>
+</dl><p>The reference ranges come from the configuration. The review score weights the distance from the range by sample size. Probability, expected value and uncertainty intervals are outside this calculation.</p></section>
 <section class="panel notice" id="audit"><h2>Fold-to-flop-c-bet audit</h2>
 <p>The node requires a known preflop aggressor, a heads-up flop, the aggressor’s first bet without a donk lead, and a subsequent fold, call or raise from the defender. Missing actions and excluded situations receive reason codes in the local audit.</p>
 <p>The PL50 snapshot shows 44.6% folds in single-raised pots (2,102 opportunities) and 43.2% in three-bet pots (837 opportunities). The comparison CoinPoker HUD displays roughly 25–39%.</p>

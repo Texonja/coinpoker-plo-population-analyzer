@@ -11,6 +11,7 @@ LABELS = {
     "benchmark_flag": "Status", "leak_note": "Review note", "bet_pct": "Bet %",
     "check_pct": "Check %", "fold_pct": "Fold %", "call_pct": "Call %",
     "raise_pct": "Raise %", "avg_size_pct": "Avg. size %", "observed": "Observed %",
+    "reference_range": "Reference range",
     "fourbettor_position": "Position", "total_4bets_stack_filtered": "4-bets",
     "known_4bettor_hands": "Known", "known_rate_pct": "Reveal %",
     "known_AAxx": "AAxx", "AAxx_pct_of_known": "AAxx %", "unknown_4bettor_hands": "Unknown",
@@ -18,10 +19,10 @@ LABELS = {
 }
 TEXT_COLUMNS = {"spot_id", "spot_name", "stake_label", "pot_type", "benchmark_metric",
                 "confidence", "benchmark_flag", "leak_note", "fourbettor_position", "hand_class"}
-STATUS = {"LOW": "Below band", "HIGH": "Above band", "OK": "In band",
+STATUS = {"LOW": "Below range", "HIGH": "Above range", "OK": "Within range",
           "low_sample": "Low sample", "audit_required": "Audit required"}
 POTS = {"srp": "SRP", "3bet": "3-bet", "4bet+": "4-bet+", "limped": "Limped"}
-CHART_NAMES = {"key_leaks": "Observed frequencies & review bands",
+CHART_NAMES = {"key_leaks": "Observed frequencies & reference ranges",
                "spot_pottype_heatmap": "Deviation by decision node",
                "response_mix": "Fold / call / raise",
                "aaxx_by_position": "AAxx by position",
@@ -52,15 +53,19 @@ def metric_name(key):
     return LABELS.get(key, str(key).replace("_", " ").capitalize()).removesuffix(" %")
 
 
+def reference_range(row):
+    low, high = row.get("benchmark_low"), row.get("benchmark_high")
+    return "—" if low in ("", None) or high in ("", None) else f"{formatted(low)}–{formatted(high)}%"
+
+
 def detail_data(row):
     metric = row.get("benchmark_metric") or "fold_pct"
-    low, high = row.get("benchmark_low"), row.get("benchmark_high")
-    band = "—" if low in ("", None) or high in ("", None) else f"{formatted(low)}–{formatted(high)}%"
     data = {
         "name": node_name(row), "context": f"{row.get('stake_label', 'All stakes')} · {POTS.get(row.get('pot_type'), row.get('pot_type', ''))}",
         "observed": formatted(row.get(metric)) + "%", "metric": metric_name(metric).lower(),
         "opportunities": formatted(row.get("opportunities")),
-        "band": band, "status": STATUS.get(row.get("benchmark_flag"), row.get("benchmark_flag", "—")),
+        "reference_range": reference_range(row),
+        "status": STATUS.get(row.get("benchmark_flag"), row.get("benchmark_flag", "—")),
         "note": row.get("leak_note") or "Observed action frequencies in this decision node.",
     }
     for action in ("bet", "check", "fold", "call", "raise"):
@@ -102,6 +107,9 @@ def html_table(rows, columns, max_rows=None, selectable=False, compact=False):
             elif col == "observed":
                 cell = e(formatted(row.get(row.get("benchmark_metric", ""), "")))
                 classes = "numeric blue"
+            elif col == "reference_range":
+                cell = e(reference_range(row))
+                classes = "numeric"
             elif col not in TEXT_COLUMNS:
                 cell = e(formatted(value))
                 classes = "numeric accent" if col == "deviation_pp" else "numeric"
@@ -132,7 +140,7 @@ def node_detail(row):
             f'<div class="detail-context">{field("context")}</div>'
             f'<div class="detail-result"><strong>{field("observed")}</strong>{field("metric")}</div>'
             f'<div class="stat-row"><span>Opportunities</span><strong>{field("opportunities")}</strong></div>'
-            f'<div class="stat-row"><span>Review band</span><strong>{field("band")}</strong></div>'
+            f'<div class="stat-row"><span>Reference range</span><strong>{field("reference_range")}</strong></div>'
             f'<div class="stat-row"><span>Status</span><strong>{field("status")}</strong></div>'
             '<div class="mini-title">Action distribution</div><div class="mini-chart">'
             '<div class="axis"><span>0</span><span>50</span><span>100%</span></div>'
@@ -190,7 +198,7 @@ def page(title, subtitle, active, body, metrics, nav=None, csv_link=None, contex
 
 METHOD_NOTE = """<details id="method"><summary>Definitions &amp; review notes</summary><div class="detail-body">
 <p>Percentages use the opportunities recorded for each decision node. Average size is measured against the pot before the action.</p>
-<p>Below band and Above band compare the selected metric with configurable review bands. Sample labels reflect coarse count thresholds. Review score combines distance from the band with sample weight.</p>
+<p>Status compares the observed rate with the reference range set for that metric. The review score weights the distance from the range by sample size.</p>
 <p>Audit required marks unresolved definitions and suppresses review scoring. Fold-to-flop-c-bet results remain under audit pending comparison with the CoinPoker HUD denominator.</p>
 <p>Exact filters, benchmark definitions and aggregate splits are saved alongside each generated report. Local hand-level audit files support source review and contain private data.</p>
 </div></details>"""
@@ -198,13 +206,14 @@ METHOD_NOTE = """<details id="method"><summary>Definitions &amp; review notes</s
 
 def pool_report(outdir, filters, summary, leak_rows, chart_paths, nav=None):
     columns = ["spot_id", "stake_label", "pot_type", "opportunities", "benchmark_metric",
-               "observed", "deviation_pp", "benchmark_flag"]
+               "observed", "reference_range", "deviation_pp", "benchmark_flag"]
     top = leak_rows[:12]
     table = panel("Priority review", html_table(top, columns, selectable=True),
                   f"{len(top)} nodes", '<p class="panel-note">Select a row to inspect its sample and action distribution.</p>')
     body = '<div class="report-grid">' + table + '<aside class="sticky">' + node_detail(top[0] if top else None) + "</aside></div>"
     cols = ["spot_id", "stake_label", "pot_type", "opportunities", "bet_pct", "check_pct",
-            "fold_pct", "call_pct", "raise_pct", "avg_size_pct", "benchmark_flag", "confidence", "exploit_score"]
+            "fold_pct", "call_pct", "raise_pct", "avg_size_pct", "benchmark_metric", "reference_range",
+            "benchmark_flag", "confidence", "exploit_score"]
     body += '<div class="subsection">' + panel("All decision nodes", html_table(summary, cols),
                                              f"{len(summary)} rows") + "</div>"
     body += '<h2 class="section-title">Charts</h2>' + chart_gallery(chart_paths, outdir) + METHOD_NOTE

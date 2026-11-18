@@ -12,7 +12,7 @@ It does not assign risk scores to accounts and it does not claim to detect multi
 2. **Normalize** — convert actions into consistent categories, reconstruct pot-relative sizes and label pot type and board texture.
 3. **Identify opportunities** — emit a record only when the exact preconditions for a named decision node are met.
 4. **Aggregate** — group records by stake, pot type and optional context dimensions.
-5. **Review** — compare a selected metric with a configurable benchmark band and attach sample-size confidence.
+5. **Review** — compare a selected metric with its configured reference range and label the sample size.
 6. **Audit** — retain local spot-level records so an analyst can inspect false positives or parsing edge cases.
 
 ## Core definitions
@@ -44,18 +44,18 @@ Multiway flops, missing flop actions, check-throughs, donk leads and malformed o
 
 The local analyzer's result does not currently match the comparison CoinPoker HUD range. Until denominator equivalence is established, this spot is marked `audit_required` and must not be used for strategy inference.
 
-## Benchmark interpretation
+## Reference ranges
 
-The file `config/benchmarks.default.json` contains practical review bands. A row can be:
+The file `config/benchmarks.default.json` sets the reference ranges for review.
 
-- `LOW` or `HIGH` when the observed metric is outside the band and meets `--min-sample`;
-- `OK` when it is inside the band;
-- `low_sample` when there are too few opportunities to promote the observation;
-- `audit_required` when an unresolved definition or external comparison blocks interpretation.
+- **Below range** (`LOW`) or **Above range** (`HIGH`) when the observed rate is outside its reference range and meets `--min-sample`.
+- **Within range** (`OK`) when the observed rate is inside the range, including its endpoints.
+- **Low sample** (`low_sample`) when the count falls below the reporting threshold.
+- **Audit required** (`audit_required`) when an unresolved definition or external comparison blocks interpretation.
 
-The bands are not solver truth. They should be versioned for a specific research question, stake environment and time window. The generated report copies the exact benchmark file used into the output directory.
+Use reference ranges suited to the research question, stakes and time window. Each run saves the ranges it used alongside the report.
 
-The dashboard's exploit score is a prioritization aid based on distance from the band and a coarse sample-size weight. It is not a probability, confidence interval or expected-value estimate. Rows marked `audit_required` receive zero deviation and zero exploit score.
+The review score helps prioritize rows by weighting their distance from the reference range by sample size. Estimating probability, expected value or uncertainty takes a separate analysis. Rows marked `audit_required` receive zero deviation and zero review score.
 
 ## Four-bet showdown analysis
 
