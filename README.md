@@ -6,7 +6,7 @@ In single-raised pots, the player in position bet **345 times** and checked back
 
 On **8♦ Q♣ K♦**, the hijack bets ₮2.49 into ₮4.98 and the small blind folds. This public example adds one IP bet and one OOP fold to the replay. [Read the original hand.](https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L5402-L5435)
 
-The study opens directly on GitHub. For the interactive edition on Windows, choose **Extract all** on the release ZIP and double-click **START.bat** in the extracted folder. On another system, open **docs/index.html**. The demo runs without Python. [Download the latest demo ZIP](https://github.com/Texonja/coinpoker-plo-population-analyzer/releases/latest/download/coinpoker-plo-population-analyzer.zip)
+For the interactive edition on Windows, extract the ZIP and double-click **START.bat**. On another system, open **docs/index.html** in a browser. The demo runs without Python. [Download the latest demo ZIP](https://github.com/Texonja/coinpoker-plo-population-analyzer/releases/latest/download/coinpoker-plo-population-analyzer.zip)
 
 ## What the project measures
 

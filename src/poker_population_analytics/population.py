@@ -41,7 +41,7 @@ try:
     from .common import RANK_VALUE, assign_positions, board_texture, parse_header, split_hand_history, suited_ace, straight_window, unique_hand_blocks, valid_cards, validate_cli_filters, save_run_manifest
     from . import report_ui
 except ImportError:  # Supports direct execution during local debugging.
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
     from common import RANK_VALUE, assign_positions, board_texture, parse_header, split_hand_history, suited_ace, straight_window, unique_hand_blocks, valid_cards, validate_cli_filters, save_run_manifest
     import report_ui
 
