@@ -32,10 +32,10 @@ PlayerEpsilon: folds
 PlayerGamma: RETURN ₮8.00
 *** SHOWDOWN ***
 PlayerGamma: shows [As Ah Kd Qd]
-PlayerGamma collected ₮8.80 from pot
+PlayerGamma collected ₮8.75 from pot
 *** SUMMARY ***
-Total pot ₮9.10 | Rake ₮0.25 | Splash Fee ₮0.05
-Seat 4: PlayerGamma showed [As Ah Kd Qd] and won (₮8.80)
+Total pot ₮9.05 | Rake ₮0.25 | Splash Fee ₮0.05
+Seat 4: PlayerGamma showed [As Ah Kd Qd] and won (₮8.75)
 
 CoinPoker Hand #9000000002: PLO 4 (₮0.25/₮0.50/₮0.05) 2026/01/10 20:03:00 CET
 Table 'SYNTHETIC-01' 6-max Seat #3 is the button
@@ -72,10 +72,10 @@ Hero: bets ₮1.80
 PlayerGamma: folds
 Hero: RETURN ₮1.80
 *** SHOWDOWN ***
-Hero collected ₮3.25 from pot
+Hero collected ₮3.15 from pot
 *** SUMMARY ***
-Total pot ₮3.40 | Rake ₮0.10 | Splash Fee ₮0.05
-Seat 3: Hero won (₮3.25)
+Total pot ₮3.30 | Rake ₮0.10 | Splash Fee ₮0.05
+Seat 3: Hero won (₮3.15)
 
 CoinPoker Hand #9000000003: PLO 4 (₮0.25/₮0.50/₮0.05) 2026/01/10 20:06:00 CET
 Table 'SYNTHETIC-01' 6-max Seat #6 is the button
@@ -119,10 +119,10 @@ PlayerEpsilon: checks
 *** SHOWDOWN ***
 PlayerDelta: shows [Ac Ad 8h 4h]
 PlayerEpsilon: shows [Kh Qc Jh Tc]
-PlayerDelta collected ₮7.20 from pot
+PlayerDelta collected ₮7.45 from pot
 *** SUMMARY ***
-Total pot ₮7.50 | Rake ₮0.25 | Splash Fee ₮0.05
-Seat 5: PlayerDelta showed [Ac Ad 8h 4h] and won (₮7.20)
+Total pot ₮7.75 | Rake ₮0.25 | Splash Fee ₮0.05
+Seat 5: PlayerDelta showed [Ac Ad 8h 4h] and won (₮7.45)
 
 CoinPoker Hand #9000000004: PLO 4 (₮0.25/₮0.50/₮0.05) 2026/01/10 20:09:00 CET
 Table 'SYNTHETIC-01' 6-max Seat #2 is the button
@@ -161,8 +161,8 @@ PlayerGamma: bets ₮1.80
 PlayerAlpha: folds
 PlayerGamma: RETURN ₮1.80
 *** SHOWDOWN ***
-PlayerGamma collected ₮3.25 from pot
+PlayerGamma collected ₮2.90 from pot
 *** SUMMARY ***
-Total pot ₮3.40 | Rake ₮0.10 | Splash Fee ₮0.05
-Seat 4: PlayerGamma won (₮3.25)
+Total pot ₮3.05 | Rake ₮0.10 | Splash Fee ₮0.05
+Seat 4: PlayerGamma won (₮2.90)
 

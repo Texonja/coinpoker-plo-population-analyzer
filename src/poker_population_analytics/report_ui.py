@@ -7,7 +7,7 @@ ASSETS = Path(__file__).parent
 LABELS = {
     "spot_id": "Decision node", "spot_name": "Decision node", "stake_label": "Stake",
     "pot_type": "Pot", "opportunities": "Opps", "benchmark_metric": "Metric",
-    "deviation_pp": "Diff. pp", "exploit_score": "Review score", "confidence": "Sample",
+    "deviation_pp": "Diff. pp", "exploit_score": "Review score", "confidence": "Sample size (n)",
     "benchmark_flag": "Status", "leak_note": "Review note", "bet_pct": "Bet %",
     "check_pct": "Check %", "fold_pct": "Fold %", "call_pct": "Call %",
     "raise_pct": "Raise %", "avg_size_pct": "Avg. size %", "observed": "Observed %",
@@ -102,6 +102,8 @@ def html_table(rows, columns, max_rows=None, selectable=False, compact=False):
                 cell = e(POTS.get(value, value))
             elif col == "benchmark_flag":
                 cell = f'<span class="status {e(str(value).lower())}">{e(STATUS.get(value, value))}</span>'
+            elif col == "confidence":
+                cell = e({"IGNORE": "<30", "LOW": "30–99", "MEDIUM": "100–299", "HIGH": "300+"}.get(value, value))
             elif col == "benchmark_metric":
                 cell = e(metric_name(value))
             elif col == "observed":
@@ -140,7 +142,7 @@ def node_detail(row):
             f'<div class="detail-context">{field("context")}</div>'
             f'<div class="detail-result"><strong>{field("observed")}</strong>{field("metric")}</div>'
             f'<div class="stat-row"><span>Opportunities</span><strong>{field("opportunities")}</strong></div>'
-            f'<div class="stat-row"><span>Reference range</span><strong>{field("reference_range")}</strong></div>'
+            f'<div class="stat-row"><span>Analyst-set range</span><strong>{field("reference_range")}</strong></div>'
             f'<div class="stat-row"><span>Status</span><strong>{field("status")}</strong></div>'
             '<div class="mini-title">Action distribution</div><div class="mini-chart">'
             '<div class="axis"><span>0</span><span>50</span><span>100%</span></div>'
@@ -198,7 +200,7 @@ def page(title, subtitle, active, body, metrics, nav=None, csv_link=None, contex
 
 METHOD_NOTE = """<details id="method"><summary>Definitions &amp; review notes</summary><div class="detail-body">
 <p>Percentages use the opportunities recorded for each decision node. Average size is measured against the pot before the action.</p>
-<p>Status compares the observed rate with the reference range set for that metric. The review score weights the distance from the range by sample size.</p>
+<p>An analyst sets each reference range. The review score weights the distance from that range by sample size. The sample tier depends only on opportunity count. Statistical confidence, strategic error and profitability each require further analysis.</p>
 <p>Audit required marks unresolved definitions and suppresses review scoring. Fold-to-flop-c-bet results remain under audit pending comparison with the CoinPoker HUD denominator.</p>
 <p>Exact filters, benchmark definitions and aggregate splits are saved alongside each generated report. Local hand-level audit files support source review and contain private data.</p>
 </div></details>"""
@@ -209,7 +211,7 @@ def pool_report(outdir, filters, summary, leak_rows, chart_paths, nav=None):
                "observed", "reference_range", "deviation_pp", "benchmark_flag"]
     top = leak_rows[:12]
     table = panel("Priority review", html_table(top, columns, selectable=True),
-                  f"{len(top)} nodes", '<p class="panel-note">Select a row to inspect its sample and action distribution.</p>')
+                  f"{len(top)} nodes", '<p class="panel-note">Select a row to inspect its opportunity count and action distribution. Reference ranges are set by hand. Sample tiers use opportunity counts alone. Review scores rank descriptive gaps and do not estimate expected value.</p>')
     body = '<div class="report-grid">' + table + '<aside class="sticky">' + node_detail(top[0] if top else None) + "</aside></div>"
     cols = ["spot_id", "stake_label", "pot_type", "opportunities", "bet_pct", "check_pct",
             "fold_pct", "call_pct", "raise_pct", "avg_size_pct", "benchmark_metric", "reference_range",
@@ -227,7 +229,7 @@ def pool_report(outdir, filters, summary, leak_rows, chart_paths, nav=None):
     (outdir / "pool_dashboard.html").write_text(html, encoding="utf-8")
 
 
-def fourbet_report(outdir, summary, classes, chart_paths, min_stack, stake, nav=None):
+def fourbet_report(outdir, summary, classes, chart_paths, min_stack, stake, nav=None, *, include_hero=False):
     totals = [row for row in summary if row.get("fourbettor_position") == "ALL"]
     if not totals:
         totals = summary
@@ -244,7 +246,8 @@ def fourbet_report(outdir, summary, classes, chart_paths, min_stack, stake, nav=
     body = '<div class="report-grid">' + table + '<aside>' + composition
     body += f'<details open><summary>Sample coverage</summary><div class="detail-body"><p>{formatted(known)} of {formatted(total)} qualifying four-bets have known cards. {formatted(total-known)} hands have unknown cards.</p><p>Composition depends on cards being revealed and is affected by showdown selection.</p></div></details></aside></div>'
     body += '<h2 class="section-title">Composition charts</h2>' + chart_gallery(chart_paths, outdir)
-    body += '<details id="method"><summary>Four-bet definitions</summary><div class="detail-body"><p>A four-bet is the third preflop raise. An all-in counts when it increases the amount to call. Hero is excluded by default.</p><p>Known hand percentages use the revealed-card subset. Unknown hands remain in the coverage count.</p></div></details>'
+    actor_note = "Hero is included in this report." if include_hero else "Hero is excluded in this report."
+    body += f'<details id="method"><summary>Four-bet definitions</summary><div class="detail-body"><p>A four-bet is the third preflop raise. An all-in counts when it increases the amount to call. {actor_note}</p><p>Known hand percentages use the revealed-card subset. Unknown hands remain in the coverage count.</p></div></details>'
     metrics = [("4-bets", total), ("Known hands", known), ("AAxx / known", share)]
     html = page("Four-bet report", "Known hand composition and reveal coverage.", "Four-bet", body,
                 metrics, nav, "fourbet_summary.csv", f"{min_stack:g}bb minimum · {'All stakes' if stake in (None, '', 'all') else stake}")

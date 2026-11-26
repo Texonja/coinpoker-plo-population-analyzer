@@ -1,19 +1,507 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Population overview · CoinPoker PLO</title><link rel="stylesheet" href="assets/site.css"><link rel="icon" href="assets/favicon.svg"></head>
-<body><header>
-<div class="titlebar"><span class="app-mark" aria-hidden="true">PLO</span>
-<div class="app-name">CoinPoker <span>/</span> Population Analyzer</div><span class="local-label">Aggregate reports</span></div>
-<div class="ribbon"><div class="ribbon-tools"><a class="ribbon-tool" href="demo/pool_dashboard.html"><span class="tool-icon chart" aria-hidden="true"></span>Population</a><a class="ribbon-tool" href="demo/fourbet_dashboard.html"><span class="tool-icon chart" aria-hidden="true"></span>Four-bet</a><a class="ribbon-tool" href="demo/pool_summary.csv" download><span class="tool-icon export" aria-hidden="true"></span>Export CSV</a></div><div class="run-description">CoinPoker hand-history analysis<br>Population &amp; four-bet reports</div>
-<div class="metrics"><div class="metric"><strong>27,701</strong><span>Hands analyzed</span></div><div class="metric"><strong>19,527</strong><span>Decision records</span></div><div class="metric"><strong>0</strong><span>Parse errors</span></div></div></div>
-<nav class="tabs" aria-label="Report navigation"><a href="index.html" aria-current=page>Overview</a><a href="demo/pool_dashboard.html">Population</a><a href="demo/fourbet_dashboard.html">Four-bet</a><a href="methodology.html">Methodology</a><span class="tab-end">PLO4 · Snapshot</span></nav>
-</header><main id="overview"><div class="page-heading"><div><h1>Population overview</h1><p>Decision frequencies and response patterns from CoinPoker PLO hand histories.</p></div></div>
-<div class="overview-grid"><section class="panel "><div class="panel-head"><h2>PL50 · review nodes</h2><span class="meta"><a href="demo/pool_dashboard.html">All stakes →</a></span></div><div class="table-wrap" tabindex="0" aria-label="Scrollable results"><table class="compact-table selectable" data-review-table data-detail="node-detail"><thead><tr><th scope="col">Decision node</th><th scope="col">Pot</th><th scope="col" class="numeric">Opps</th><th scope="col" class="numeric">Observed %</th><th scope="col" class="numeric">Reference range</th><th scope="col">Status</th></tr></thead><tbody><tr tabindex="0" aria-selected="true" data-detail="{&quot;name&quot;: &quot;Bet IP vs missed flop c-bet&quot;, &quot;context&quot;: &quot;PL50 \u00b7 SRP&quot;, &quot;observed&quot;: &quot;40.7%&quot;, &quot;metric&quot;: &quot;bet&quot;, &quot;opportunities&quot;: &quot;847&quot;, &quot;reference_range&quot;: &quot;45\u201370%&quot;, &quot;status&quot;: &quot;Below range&quot;, &quot;note&quot;: &quot;pool under-stabs vs missed flop c-bet; check response stats before pure-bluffing more&quot;, &quot;bet&quot;: &quot;40.7%&quot;, &quot;check&quot;: &quot;59.3%&quot;, &quot;fold&quot;: &quot;0%&quot;, &quot;call&quot;: &quot;0%&quot;, &quot;raise&quot;: &quot;0%&quot;}"><td class="spot-cell"><span title="BET_IP_VS_MISSED_FLOP_CB">Bet IP vs missed flop c-bet</span></td><td class="">SRP</td><td class="numeric">847</td><td class="numeric blue">40.7</td><td class="numeric">45–70%</td><td class=""><span class="status low">Below range</span></td></tr><tr tabindex="-1" aria-selected="false" data-detail="{&quot;name&quot;: &quot;Bet IP vs missed flop c-bet&quot;, &quot;context&quot;: &quot;PL50 \u00b7 3-bet&quot;, &quot;observed&quot;: &quot;39%&quot;, &quot;metric&quot;: &quot;bet&quot;, &quot;opportunities&quot;: &quot;354&quot;, &quot;reference_range&quot;: &quot;45\u201370%&quot;, &quot;status&quot;: &quot;Below range&quot;, &quot;note&quot;: &quot;pool under-stabs vs missed flop c-bet; check response stats before pure-bluffing more&quot;, &quot;bet&quot;: &quot;39%&quot;, &quot;check&quot;: &quot;61%&quot;, &quot;fold&quot;: &quot;0%&quot;, &quot;call&quot;: &quot;0%&quot;, &quot;raise&quot;: &quot;0%&quot;}"><td class="spot-cell"><span title="BET_IP_VS_MISSED_FLOP_CB">Bet IP vs missed flop c-bet</span></td><td class="">3-bet</td><td class="numeric">354</td><td class="numeric blue">39</td><td class="numeric">45–70%</td><td class=""><span class="status low">Below range</span></td></tr><tr tabindex="-1" aria-selected="false" data-detail="{&quot;name&quot;: &quot;Bet IP vs missed turn c-bet after flop c-bet/call&quot;, &quot;context&quot;: &quot;PL50 \u00b7 SRP&quot;, &quot;observed&quot;: &quot;38.3%&quot;, &quot;metric&quot;: &quot;bet&quot;, &quot;opportunities&quot;: &quot;162&quot;, &quot;reference_range&quot;: &quot;45\u201370%&quot;, &quot;status&quot;: &quot;Below range&quot;, &quot;note&quot;: &quot;pool under-stabs vs missed turn c-bet after calling flop&quot;, &quot;bet&quot;: &quot;38.3%&quot;, &quot;check&quot;: &quot;61.7%&quot;, &quot;fold&quot;: &quot;0%&quot;, &quot;call&quot;: &quot;0%&quot;, &quot;raise&quot;: &quot;0%&quot;}"><td class="spot-cell"><span title="BET_IP_VS_MISSED_TURN_CB">Bet IP vs missed turn c-bet after flop c-bet/call</span></td><td class="">SRP</td><td class="numeric">162</td><td class="numeric blue">38.3</td><td class="numeric">45–70%</td><td class=""><span class="status low">Below range</span></td></tr><tr tabindex="-1" aria-selected="false" data-detail="{&quot;name&quot;: &quot;Fold/call/raise vs delayed c-bet, responder IP&quot;, &quot;context&quot;: &quot;PL50 \u00b7 3-bet&quot;, &quot;observed&quot;: &quot;62.4%&quot;, &quot;metric&quot;: &quot;fold&quot;, &quot;opportunities&quot;: &quot;101&quot;, &quot;reference_range&quot;: &quot;35\u201360%&quot;, &quot;status&quot;: &quot;Above range&quot;, &quot;note&quot;: &quot;IP overfolds vs delayed c-bet; OOP delayed c-bets can bluff more&quot;, &quot;bet&quot;: &quot;0%&quot;, &quot;check&quot;: &quot;0%&quot;, &quot;fold&quot;: &quot;62.4%&quot;, &quot;call&quot;: &quot;33.7%&quot;, &quot;raise&quot;: &quot;4%&quot;}"><td class="spot-cell"><span title="FOLD_TO_DELAYED_CBET_IP">Fold/call/raise vs delayed c-bet, responder IP</span></td><td class="">3-bet</td><td class="numeric">101</td><td class="numeric blue">62.4</td><td class="numeric">35–60%</td><td class=""><span class="status high">Above range</span></td></tr><tr tabindex="-1" aria-selected="false" data-detail="{&quot;name&quot;: &quot;Fold/call/3bet vs flop check-raise&quot;, &quot;context&quot;: &quot;PL50 \u00b7 3-bet&quot;, &quot;observed&quot;: &quot;28.9%&quot;, &quot;metric&quot;: &quot;fold&quot;, &quot;opportunities&quot;: &quot;90&quot;, &quot;reference_range&quot;: &quot;30\u201355%&quot;, &quot;status&quot;: &quot;Below range&quot;, &quot;note&quot;: &quot;bettors do not fold enough vs flop check-raise; x/r should be value/equity-heavy&quot;, &quot;bet&quot;: &quot;0%&quot;, &quot;check&quot;: &quot;0%&quot;, &quot;fold&quot;: &quot;28.9%&quot;, &quot;call&quot;: &quot;41.1%&quot;, &quot;raise&quot;: &quot;30%&quot;}"><td class="spot-cell"><span title="FOLD_TO_FLOP_CHECK_RAISE">Fold/call/3bet vs flop check-raise</span></td><td class="">3-bet</td><td class="numeric">90</td><td class="numeric blue">28.9</td><td class="numeric">30–55%</td><td class=""><span class="status low">Below range</span></td></tr><tr tabindex="-1" aria-selected="false" data-detail="{&quot;name&quot;: &quot;Fold/call/raise vs delayed c-bet, responder OOP&quot;, &quot;context&quot;: &quot;PL50 \u00b7 3-bet&quot;, &quot;observed&quot;: &quot;61.4%&quot;, &quot;metric&quot;: &quot;fold&quot;, &quot;opportunities&quot;: &quot;57&quot;, &quot;reference_range&quot;: &quot;35\u201360%&quot;, &quot;status&quot;: &quot;Above range&quot;, &quot;note&quot;: &quot;OOP overfolds vs delayed c-bet; IP delayed c-bets can bluff more&quot;, &quot;bet&quot;: &quot;0%&quot;, &quot;check&quot;: &quot;0%&quot;, &quot;fold&quot;: &quot;61.4%&quot;, &quot;call&quot;: &quot;31.6%&quot;, &quot;raise&quot;: &quot;7%&quot;}"><td class="spot-cell"><span title="FOLD_TO_DELAYED_CBET_OOP">Fold/call/raise vs delayed c-bet, responder OOP</span></td><td class="">3-bet</td><td class="numeric">57</td><td class="numeric blue">61.4</td><td class="numeric">35–60%</td><td class=""><span class="status high">Above range</span></td></tr><tr tabindex="-1" aria-selected="false" data-detail="{&quot;name&quot;: &quot;Fold/call/3bet vs turn check-raise&quot;, &quot;context&quot;: &quot;PL50 \u00b7 3-bet&quot;, &quot;observed&quot;: &quot;33.3%&quot;, &quot;metric&quot;: &quot;fold&quot;, &quot;opportunities&quot;: &quot;30&quot;, &quot;reference_range&quot;: &quot;40\u201365%&quot;, &quot;status&quot;: &quot;Below range&quot;, &quot;note&quot;: &quot;bettors continue too much vs turn check-raise; turn x/r should be strong&quot;, &quot;bet&quot;: &quot;0%&quot;, &quot;check&quot;: &quot;0%&quot;, &quot;fold&quot;: &quot;33.3%&quot;, &quot;call&quot;: &quot;60%&quot;, &quot;raise&quot;: &quot;6.7%&quot;}"><td class="spot-cell"><span title="FOLD_TO_TURN_CHECK_RAISE">Fold/call/3bet vs turn check-raise</span></td><td class="">3-bet</td><td class="numeric">30</td><td class="numeric blue">33.3</td><td class="numeric">40–65%</td><td class=""><span class="status low">Below range</span></td></tr></tbody></table></div><p class="panel-note">Select a row to see which action the observed rate and reference range measure.</p></section><section class="panel "><div class="panel-head"><h2>Node detail</h2><span class="meta">Selected row</span></div><div id="node-detail" class="spot-detail" aria-live="polite"><h3><span data-field="name">Bet IP vs missed flop c-bet</span></h3><div class="detail-context"><span data-field="context">PL50 · SRP</span></div><div class="detail-result"><strong><span data-field="observed">40.7%</span></strong><span data-field="metric">bet</span></div><div class="stat-row"><span>Opportunities</span><strong><span data-field="opportunities">847</span></strong></div><div class="stat-row"><span>Reference range</span><strong><span data-field="reference_range">45–70%</span></strong></div><div class="stat-row"><span>Status</span><strong><span data-field="status">Below range</span></strong></div><div class="mini-title">Action distribution</div><div class="mini-chart"><div class="axis"><span>0</span><span>50</span><span>100%</span></div><div class="bar-row"><span>Bet</span><div class="track"><i data-bar="bet" style="width:40.7%"></i></div><b><span data-field="bet">40.7%</span></b></div><div class="bar-row"><span>Check</span><div class="track"><i data-bar="check" style="width:59.3%"></i></div><b><span data-field="check">59.3%</span></b></div><div class="bar-row"><span>Fold</span><div class="track"><i data-bar="fold" style="width:0%"></i></div><b><span data-field="fold">0%</span></b></div><div class="bar-row"><span>Call</span><div class="track"><i data-bar="call" style="width:0%"></i></div><b><span data-field="call">0%</span></b></div><div class="bar-row"><span>Raise</span><div class="track"><i data-bar="raise" style="width:0%"></i></div><b><span data-field="raise">0%</span></b></div></div><p class="detail-note"><span data-field="note">pool under-stabs vs missed flop c-bet; check response stats before pure-bluffing more</span></p></div></section></div><div class="summary-grid"><section class="panel "><div class="panel-head"><h2>Four-bet sample</h2><span class="meta"></span></div><div class="highlight"><div class="small">Known / shown hands</div>
-<div class="value">58.9% <span class="muted" style="font-size:14px">AAxx</span></div>
-<p>172 of 292 known hands across 468 qualifying events.</p>
-<p><a href="demo/fourbet_dashboard.html">Open four-bet report →</a></p></div></section><section class="panel "><div class="panel-head"><h2>Dataset</h2><span class="meta"></span></div><div class="highlight"><div class="stat-row"><span>Raw hands</span><strong>38,248</strong></div>
-<div class="stat-row"><span>Included hands</span><strong>27,701</strong></div>
-<p>Regular PLO4 · PL25 / PL50 / PL100<br>Straddles and hero actions excluded.</p></div></section><section class="panel notice"><div class="panel-head"><h2>Definition audit</h2><span class="meta"></span></div><div class="highlight"><h3>Fold to flop c-bet</h3>
-<p>PL50 · 44.6% SRP / 43.2% 3-bet. The comparison HUD uses a lower range. Review scoring is withheld pending denominator validation.</p>
-<p><a href="methodology.html#audit">Review audit status →</a></p></div></section></div></main><footer class="report-footer"><span><i class="dot"></i>Report ready</span><span>CoinPoker · Population analysis</span></footer>
-<script src="assets/report.js"></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>When the raiser checks · PL50 | CoinPoker Population Analyzer</title><style>:root {
+  color-scheme:light;
+  --ink:#122d32;
+  --teal:#006b60;
+  --rule:#cbd8d4;
+  --paper:#f6f7f1;
+  --sub:#42605c;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html {
+  scroll-padding-top:1.2rem;
+}
+
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:16px/1.55 "Inter","Segoe UI",sans-serif;
+}
+
+a {
+  color:var(--teal);
+  text-underline-offset:.2em;
+}
+
+a:focus-visible,summary:focus-visible,[tabindex]:focus-visible {
+  outline:3px solid #c47519;
+  outline-offset:4px;
+}
+
+.shell {
+  max-width:1140px;
+  margin:auto;
+  padding-inline:clamp(18px,5vw,74px);
+}
+
+header,.lead {
+  background:#103331;
+  color:#f7f7ed;
+}
+
+.top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  min-height:68px;
+}
+
+.brand {
+  font-weight:700;
+  text-decoration:none;
+}
+
+.brand b {
+  font-size:24px;
+  color:#b9ec90;
+  margin-right:6px;
+}
+
+.brand span {
+  color:#bbceca;
+  font-weight:450;
+}
+
+.top a {
+  color:inherit;
+}
+
+.top nav {
+  display:flex;
+  gap:20px;
+  font-size:.88rem;
+}
+
+.top nav a {
+  text-decoration:none;
+}
+
+.top nav a:hover,.brand:hover {
+  text-decoration:underline;
+}
+
+.lead {
+  border-block:1px solid #49635d;
+}
+
+.intro {
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:8%;
+  align-items:center;
+  padding-block:clamp(37px,5vw,68px);
+}
+
+.kicker {
+  font-size:.73rem;
+  letter-spacing:.12em;
+  font-weight:700;
+  color:var(--teal);
+  margin:0 0 .65rem;
+}
+
+.lead .kicker {
+  color:#b9ec90;
+}
+
+h1,h2 {
+  font-family:"Baskervville",Georgia,serif;
+  font-weight:500;
+  line-height:1.07;
+  letter-spacing:-.035em;
+}
+
+h1 {
+  font-size:clamp(44px,6.5vw,78px);
+  margin:0;
+}
+
+.deck {
+  font-size:1.06rem;
+  color:#deebe4;
+  max-width:53ch;
+}
+
+.button {
+  display:inline-flex;
+  align-items:center;
+  gap:25px;
+  margin-top:6px;
+  padding:9px 16px;
+  background:#c0ed98;
+  color:#15362d;
+  text-decoration:none;
+  font-weight:680;
+  border-radius:3px;
+}
+
+.button:hover {
+  background:#d4ffb0;
+}
+
+.hero-stat {
+  border-left:1px solid #55766d;
+  padding-left:clamp(20px,3vw,50px);
+}
+
+.hero-stat p {
+  margin:0;
+  font-weight:600;
+}
+
+.hero-stat strong {
+  display:block;
+  font-family:"Baskervville",Georgia,serif;
+  font-size:clamp(54px,7vw,94px);
+  line-height:1.15;
+  font-weight:500;
+  letter-spacing:-.055em;
+}
+
+.bar {
+  height:10px;
+  background:#55766d;
+  margin-block:15px 7px;
+}
+
+.bar i {
+  display:block;
+  height:100%;
+  background:#c0ed98;
+}
+
+.legend {
+  display:flex;
+  justify-content:space-between;
+  color:#d3e1d9;
+  font-size:.85rem;
+}
+
+.hero-stat a {
+  display:block;
+  color:#c0ed98;
+  margin-top:21px;
+  font-size:.9rem;
+}
+
+.content>section {
+  padding-block:clamp(32px,5vw,58px);
+  border-bottom:1px solid var(--rule);
+}
+
+h2 {
+  font-size:clamp(31px,4.1vw,48px);
+  margin:0 0 .8rem;
+}
+
+p {
+  max-width:85ch;
+}
+
+.split {
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:8%;
+  align-items:start;
+}
+
+.aside,.hand-label small,td small {
+  color:var(--sub);
+}
+
+.aside {
+  font-size:.9rem;
+}
+
+.hand {
+  background:#fffef8;
+  border:1px solid #b8c9bf;
+  border-radius:5px;
+  align-self:start;
+  overflow:hidden;
+}
+
+.hand summary {
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  justify-content:space-between;
+  padding:15px;
+  list-style:none;
+}
+
+.hand summary::-webkit-details-marker {
+  display:none;
+}
+
+.hand summary::after {
+  content:"+";
+  font-size:1.2rem;
+  color:var(--teal);
+  font-weight:700;
+}
+
+.hand[open] summary::after {
+  content:"−";
+}
+
+.hand-label {
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+
+.hand-label small {
+  font-weight:400;
+  display:block;
+  font-size:.77rem;
+}
+
+.cards {
+  display:flex;
+  gap:3px;
+  margin-left:auto;
+  white-space:nowrap;
+}
+
+.card {
+  display:inline-block;
+  min-width:27px;
+  padding:2px 4px;
+  border:1px solid #bfcdc7;
+  border-radius:3px;
+  background:white;
+  text-align:center;
+  font-family:Georgia,serif;
+  font-weight:bold;
+}
+
+.card small {
+  font-size:.72rem;
+}
+
+.suit-h,.suit-d {
+  color:#a23a34;
+}
+
+.suit-c {
+  color:#23604c;
+}
+
+.hand-body {
+  border-top:1px solid var(--rule);
+  padding:3px 15px 15px;
+  font-size:.9rem;
+}
+
+.hand-body ol {
+  list-style:decimal;
+  padding-left:1.45rem;
+}
+
+.hand-body li {
+  padding:3px 0;
+}
+
+.hand-body li::marker {
+  color:var(--sub);
+}
+
+.hand-body li small {
+  display:block;
+  color:var(--teal);
+}
+
+.table-wrap {
+  overflow:auto;
+  margin:20px 0;
+}
+
+.table-wrap table {
+  width:100%;
+  min-width:610px;
+  border-collapse:collapse;
+  font-variant-numeric:tabular-nums;
+}
+
+th,td {
+  text-align:left;
+  padding:9px 11px;
+  border-bottom:1px solid var(--rule);
+}
+
+thead {
+  background:#dfebe1;
+  font-size:.85rem;
+}
+
+tbody th {
+  font-weight:500;
+}
+
+td small {
+  display:inline-block;
+  margin-left:6px;
+}
+
+.sep {
+  color:#85988c;
+  margin:0 .4em;
+}
+
+.hand-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.hand-grid .hand-label small {
+  max-width:20ch;
+}
+
+footer {
+  padding:25px 0;
+  color:var(--sub);
+  font-size:.85rem;
+}
+
+@media(max-width:720px) {
+  .top {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:4px;
+    padding-block:12px;
+  }
+  .top nav {
+    gap:14px;
+  }
+  .intro,.split,.hand-grid {
+    grid-template-columns:1fr;
+  }
+  .intro,.split {
+    gap:25px;
+  }
+  .hero-stat {
+    padding:15px 0 0;
+    border-left:0;
+    border-top:1px solid #55766d;
+  }
+  .hero-stat strong {
+    font-size:58px;
+  }
+  .hero-stat a {
+    margin-top:12px;
+  }
+  .hand summary {
+    gap:6px;
+  }
+}
+
+@media(max-width:390px) {
+  .hand summary {
+    padding:10px;
+  }
+  .card {
+    min-width:23px;
+    padding:0 2px;
+  }
+  .brand span {
+    font-size:.9rem;
+  }
+}
+
+.proof summary {
+  cursor:pointer;
+  color:var(--teal);
+  width:max-content;
+}
+
+.proof p,.proof li {
+  max-width:28ch;
+  font-size:.84rem;
+}
+
+.proof ul {
+  padding-left:1em;
+}
+
+.proof li {
+  white-space:nowrap;
+}
+
+.proof summary:hover {
+  text-decoration:underline;
+}
+</style></head>
+<body><header><div class="shell top"><a class="brand" href="#top"><b aria-hidden="true">♠</b> CoinPoker <span>/ Population Analyzer</span></a>
+<nav aria-label="Reports"><a href="#counts">Counts</a><a href="#replay">Hands</a><a href="demo/pool_dashboard.html">Population</a><a href="demo/fourbet_dashboard.html">Four-bets</a></nav></div></header>
+<main id="top"><section class="lead"><div class="shell intro"><div><p class="kicker">POT-LIMIT OMAHA · PL50</p>
+<h1>When the raiser checks.</h1><p class="deck">Heads-up on the flop, the preflop raiser checks out of position. How often does the player behind bet, and what happens when they do?</p>
+<a class="button" href="#first-hand">Follow one hand <span>↓</span></a></div>
+<div class="hero-stat"><p>IP bet · single-raised pots</p><strong>40.7%</strong>
+<div class="bar" aria-hidden="true"><i style="width:40.73%"></i></div>
+<div class="legend"><b>345 bets</b><span>502 checks</span></div><a href="#counts">847 opportunities in the historical sample ↓</a></div></div></section>
+<div class="shell content"><section id="first-hand" class="split"><div><p class="kicker">SOURCE HAND · LEAK FINDER</p><h2>From a flop to two records</h2>
+<p>The small blind was the last preflop raiser. The hijack bets half pot after the check. Count one bet for the hijack and one fold for the small blind.</p>
+<p class="aside">IP acts last on the flop. OOP acts first. A bet by IP after the raiser checks is called a <em>stab</em>.</p></div>
+<details class="hand" id="h9000002879" open>
+<summary><span class="hand-label">#9000002879<small>Single-raised pot · SB raised last preflop</small></span>
+<span class="cards" aria-label="8♦ Q♣ K♦"><span class="card suit-d">8<small>♦</small></span><span class="card suit-c">Q<small>♣</small></span><span class="card suit-d">K<small>♦</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮4.98</b></p><ol><li><span>SB checks</span><small></small></li><li><span>HJ bets ₮2.49</span><small>IP after a check · bet</small></li><li><span>SB folds</span><small>OOP facing a bet · fold</small></li></ol>
+<p>Both actors are opponents. This hand supplies one IP bet and one OOP response.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L5402-L5435">Read the original hand · lines 5402–5435 ↗</a></div></details></section>
+<section id="counts"><p class="kicker">PL50 · DECISION FREQUENCIES</p><h2>How the counts add up</h2>
+<p>The historical column uses published action counts. The replay column counts decisions in all 116 eligible PL50 hands from the public Leak Finder demo. Open a historical percentage for its arithmetic or a replay count for every hand in its denominator.</p>
+<div class="table-wrap" tabindex="0" aria-label="Decision counts"><table><thead><tr><th>Pot</th><th>Decision</th><th>Action</th><th>Historical pool</th><th>Public replay</th></tr></thead><tbody><tr><td>Single-raised pot</td><td>IP after a check</td><th scope="row">Bet</th><td><details class="proof"><summary><b>40.7%</b> <small>345 / 847</small></summary><p>345 bets + 502 checks = 847 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Single-raised pot · IP after a check (CSV)</a></p></details></td><td><details class="proof"><summary>4 / 5</summary><p>Every eligible decision</p><ul><li><a href="#h9000002879">#9000002879</a> · bet</li><li><a href="#h9000005641">#9000005641</a> · check</li><li><a href="#h9000008611">#9000008611</a> · bet</li><li><a href="#h9000008616">#9000008616</a> · bet</li><li><a href="#h9000009993">#9000009993</a> · bet</li></ul></details></td></tr><tr><td>Single-raised pot</td><td>IP after a check</td><th scope="row">Check</th><td><details class="proof"><summary><b>59.3%</b> <small>502 / 847</small></summary><p>345 bets + 502 checks = 847 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Single-raised pot · IP after a check (CSV)</a></p></details></td><td><details class="proof"><summary>1 / 5</summary><p>Every eligible decision</p><ul><li><a href="#h9000002879">#9000002879</a> · bet</li><li><a href="#h9000005641">#9000005641</a> · check</li><li><a href="#h9000008611">#9000008611</a> · bet</li><li><a href="#h9000008616">#9000008616</a> · bet</li><li><a href="#h9000009993">#9000009993</a> · bet</li></ul></details></td></tr><tr><td>Single-raised pot</td><td>OOP facing a bet</td><th scope="row">Fold</th><td><details class="proof"><summary><b>48.9%</b> <small>181 / 370</small></summary><p>181 folds + 170 calls + 19 raises = 370 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Single-raised pot · OOP facing a bet (CSV)</a></p></details></td><td><details class="proof"><summary>2 / 5</summary><p>Every eligible decision</p><ul><li><a href="#h9000002857">#9000002857</a> · raise</li><li><a href="#h9000002879">#9000002879</a> · fold</li><li><a href="#h9000008611">#9000008611</a> · call</li><li><a href="#h9000008616">#9000008616</a> · call</li><li><a href="#h9000009993">#9000009993</a> · fold</li></ul></details></td></tr><tr><td>Single-raised pot</td><td>OOP facing a bet</td><th scope="row">Call</th><td><details class="proof"><summary><b>45.9%</b> <small>170 / 370</small></summary><p>181 folds + 170 calls + 19 raises = 370 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Single-raised pot · OOP facing a bet (CSV)</a></p></details></td><td><details class="proof"><summary>2 / 5</summary><p>Every eligible decision</p><ul><li><a href="#h9000002857">#9000002857</a> · raise</li><li><a href="#h9000002879">#9000002879</a> · fold</li><li><a href="#h9000008611">#9000008611</a> · call</li><li><a href="#h9000008616">#9000008616</a> · call</li><li><a href="#h9000009993">#9000009993</a> · fold</li></ul></details></td></tr><tr><td>Single-raised pot</td><td>OOP facing a bet</td><th scope="row">Raise</th><td><details class="proof"><summary><b>5.1%</b> <small>19 / 370</small></summary><p>181 folds + 170 calls + 19 raises = 370 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Single-raised pot · OOP facing a bet (CSV)</a></p></details></td><td><details class="proof"><summary>1 / 5</summary><p>Every eligible decision</p><ul><li><a href="#h9000002857">#9000002857</a> · raise</li><li><a href="#h9000002879">#9000002879</a> · fold</li><li><a href="#h9000008611">#9000008611</a> · call</li><li><a href="#h9000008616">#9000008616</a> · call</li><li><a href="#h9000009993">#9000009993</a> · fold</li></ul></details></td></tr><tr><td>Three-bet pot</td><td>IP after a check</td><th scope="row">Bet</th><td><details class="proof"><summary><b>39.0%</b> <small>138 / 354</small></summary><p>138 bets + 216 checks = 354 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Three-bet pot · IP after a check (CSV)</a></p></details></td><td><details class="proof"><summary>1 / 2</summary><p>Every eligible decision</p><ul><li><a href="#h9000005614">#9000005614</a> · bet</li><li><a href="#h9000008602">#9000008602</a> · check</li></ul></details></td></tr><tr><td>Three-bet pot</td><td>IP after a check</td><th scope="row">Check</th><td><details class="proof"><summary><b>61.0%</b> <small>216 / 354</small></summary><p>138 bets + 216 checks = 354 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Three-bet pot · IP after a check (CSV)</a></p></details></td><td><details class="proof"><summary>1 / 2</summary><p>Every eligible decision</p><ul><li><a href="#h9000005614">#9000005614</a> · bet</li><li><a href="#h9000008602">#9000008602</a> · check</li></ul></details></td></tr><tr><td>Three-bet pot</td><td>OOP facing a bet</td><th scope="row">Fold</th><td><details class="proof"><summary><b>37.2%</b> <small>42 / 113</small></summary><p>42 folds + 45 calls + 26 raises = 113 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Three-bet pot · OOP facing a bet (CSV)</a></p></details></td><td><details class="proof"><summary>1 / 1</summary><p>Every eligible decision</p><ul><li><a href="#h9000004212">#9000004212</a> · fold</li></ul></details></td></tr><tr><td>Three-bet pot</td><td>OOP facing a bet</td><th scope="row">Call</th><td><details class="proof"><summary><b>39.8%</b> <small>45 / 113</small></summary><p>42 folds + 45 calls + 26 raises = 113 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Three-bet pot · OOP facing a bet (CSV)</a></p></details></td><td><details class="proof"><summary>0 / 1</summary><p>Every eligible decision</p><ul><li><a href="#h9000004212">#9000004212</a> · fold</li></ul></details></td></tr><tr><td>Three-bet pot</td><td>OOP facing a bet</td><th scope="row">Raise</th><td><details class="proof"><summary><b>23.0%</b> <small>26 / 113</small></summary><p>42 folds + 45 calls + 26 raises = 113 opportunities.</p><p><a href="demo/pool_summary.csv">PL50 · Three-bet pot · OOP facing a bet (CSV)</a></p></details></td><td><details class="proof"><summary>0 / 1</summary><p>Every eligible decision</p><ul><li><a href="#h9000004212">#9000004212</a> · fold</li></ul></details></td></tr></tbody></table></div>
+<p class="aside">Each action is divided by the opportunities in its own decision. The actor filter applies separately to IP and OOP. An opponent can respond to a Hero bet, which explains why the number of OOP responses can exceed the number of counted IP bets.</p>
+<a href="demo/pool_summary.csv">Historical action counts (CSV) ↗</a> <span class="sep">/</span> <a href="demo/pl50_replay.json">Public decision ledger (JSON) ↗</a></section>
+<section id="replay"><p class="kicker">PUBLIC REPLAY · HAND INDEX</p><h2>Inspect the decisions</h2><p>The demo has 320 hands across stakes. PL50 contributes 116 regular PLO4 hands, including 109 with a ₮0.08 ante and 7 without an ante. The index covers every scored hand in these two pot types and one excluded lead. All nine scored hands reconcile to the published pots and awards. Across PL50, 2 other hands have a payout discrepancy.</p>
+<p><a href="#h9000002879">Return to the first example ↑</a></p><div class="hand-grid"><details class="hand" id="h9000002857">
+<summary><span class="hand-label">#9000002857<small>Single-raised pot · UTG raised last preflop</small></span>
+<span class="cards" aria-label="8♦ A♠ 5♣"><span class="card suit-d">8<small>♦</small></span><span class="card suit-s">A<small>♠</small></span><span class="card suit-c">5<small>♣</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮4.65</b></p><ol><li><span>UTG checks</span><small></small></li><li><span>BTN (Hero) bets ₮4.65</span><small></small></li><li><span>UTG raises ₮13.95 to ₮18.60</span><small>OOP facing a bet · raise</small></li><li><span>BTN (Hero) folds</span><small></small></li></ol>
+<p>Hero makes the bet. Only the opponent’s response enters the population counts.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L4443-L4472">Read the original hand · lines 4443–4472 ↗</a></div></details><details class="hand" id="h9000004212">
+<summary><span class="hand-label">#9000004212<small>Three-bet pot · SB raised last preflop</small></span>
+<span class="cards" aria-label="2♦ 2♣ 6♠"><span class="card suit-d">2<small>♦</small></span><span class="card suit-c">2<small>♣</small></span><span class="card suit-s">6<small>♠</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮6.48</b></p><ol><li><span>SB checks</span><small></small></li><li><span>BTN (Hero) bets ₮2.14</span><small></small></li><li><span>SB folds</span><small>OOP facing a bet · fold</small></li></ol>
+<p>Hero makes the bet. Only the opponent’s response enters the population counts.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L6822-L6855">Read the original hand · lines 6822–6855 ↗</a></div></details><details class="hand" id="h9000005614">
+<summary><span class="hand-label">#9000005614<small>Three-bet pot · BB raised last preflop</small></span>
+<span class="cards" aria-label="J♠ Q♠ 9♠"><span class="card suit-s">J<small>♠</small></span><span class="card suit-s">Q<small>♠</small></span><span class="card suit-s">9<small>♠</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮22.98</b></p><ol><li><span>BB (Hero) checks</span><small></small></li><li><span>HJ bets ₮7.58</span><small>IP after a check · bet</small></li><li><span>BB (Hero) calls ₮7.58</span><small></small></li></ol>
+<p>The opponent makes the bet. Hero responds, so only the IP bet enters the population counts.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L8157-L8192">Read the original hand · lines 8157–8192 ↗</a></div></details><details class="hand" id="h9000005641">
+<summary><span class="hand-label">#9000005641<small>Single-raised pot · SB raised last preflop</small></span>
+<span class="cards" aria-label="9♣ 7♣ 5♠"><span class="card suit-c">9<small>♣</small></span><span class="card suit-c">7<small>♣</small></span><span class="card suit-s">5<small>♠</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮4.90</b></p><ol><li><span>SB checks</span><small></small></li><li><span>UTG checks</span><small>IP after a check · check</small></li></ol>
+<p>The check-back adds one IP check. OOP faces no bet on this flop.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L9202-L9230">Read the original hand · lines 9202–9230 ↗</a></div></details><details class="hand" id="h9000008602">
+<summary><span class="hand-label">#9000008602<small>Three-bet pot · SB raised last preflop</small></span>
+<span class="cards" aria-label="4♣ K♥ 4♠"><span class="card suit-c">4<small>♣</small></span><span class="card suit-h">K<small>♥</small></span><span class="card suit-s">4<small>♠</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮12.48</b></p><ol><li><span>SB (Hero) checks</span><small></small></li><li><span>HJ checks</span><small>IP after a check · check</small></li></ol>
+<p>The check-back adds one IP check. OOP faces no bet on this flop.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L12821-L12853">Read the original hand · lines 12821–12853 ↗</a></div></details><details class="hand" id="h9000008611">
+<summary><span class="hand-label">#9000008611<small>Single-raised pot · SB raised last preflop</small></span>
+<span class="cards" aria-label="8♥ Q♠ T♠"><span class="card suit-h">8<small>♥</small></span><span class="card suit-s">Q<small>♠</small></span><span class="card suit-s">T<small>♠</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮3.48</b></p><ol><li><span>SB checks</span><small></small></li><li><span>BB bets ₮1.74</span><small>IP after a check · bet</small></li><li><span>SB calls ₮1.74</span><small>OOP facing a bet · call</small></li></ol>
+<p>Both actors are opponents. This hand supplies one IP bet and one OOP response.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L13121-L13153">Read the original hand · lines 13121–13153 ↗</a></div></details><details class="hand" id="h9000008616">
+<summary><span class="hand-label">#9000008616<small>Single-raised pot · UTG raised last preflop</small></span>
+<span class="cards" aria-label="3♠ 4♦ 9♦"><span class="card suit-s">3<small>♠</small></span><span class="card suit-d">4<small>♦</small></span><span class="card suit-d">9<small>♦</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮4.73</b></p><ol><li><span>UTG checks</span><small></small></li><li><span>BTN bets ₮3.75</span><small>IP after a check · bet</small></li><li><span>UTG calls ₮3.75</span><small>OOP facing a bet · call</small></li></ol>
+<p>Both actors are opponents. This hand supplies one IP bet and one OOP response.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L13268-L13300">Read the original hand · lines 13268–13300 ↗</a></div></details><details class="hand" id="h9000009993">
+<summary><span class="hand-label">#9000009993<small>Single-raised pot · UTG raised last preflop</small></span>
+<span class="cards" aria-label="5♠ 8♥ T♦"><span class="card suit-s">5<small>♠</small></span><span class="card suit-h">8<small>♥</small></span><span class="card suit-d">T<small>♦</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮4.73</b></p><ol><li><span>UTG checks</span><small></small></li><li><span>BTN bets ₮3.55</span><small>IP after a check · bet</small></li><li><span>UTG folds</span><small>OOP facing a bet · fold</small></li></ol>
+<p>Both actors are opponents. This hand supplies one IP bet and one OOP response.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L14933-L14965">Read the original hand · lines 14933–14965 ↗</a></div></details><details class="hand" id="h9000009970">
+<summary><span class="hand-label">#9000009970<small>Three-bet pot · CO raised last preflop</small></span>
+<span class="cards" aria-label="J♠ 8♣ Q♥"><span class="card suit-s">J<small>♠</small></span><span class="card suit-c">8<small>♣</small></span><span class="card suit-h">Q<small>♥</small></span></span></summary>
+<div class="hand-body"><p>Flop pot <b>₮18.48</b></p><ol><li><span>HJ (Hero) bets ₮17.98</span><small></small></li><li><span>CO folds</span><small></small></li></ol>
+<p>The caller leads before the in-position preflop raiser can act. Neither featured decision occurs.</p><a href="https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt#L13808-L13841">Read the original hand · lines 13808–13841 ↗</a></div></details></div></section>
+<section><p class="kicker">INTERPRETATION</p><h2>What changes in a three-bet pot?</h2>
+<p>IP bet frequencies were close in single-raised and three-bet pots (40.7% and 39.0%). Once OOP faced a bet, check-raises occurred in 5.1% of single-raised pots and 23.0% of three-bet pots. The latter estimate comes from 113 responses. Stack depth, board and bet size can differ between the groups.</p><p>The historical pool contains aggregate rows from a private export. The hand examples come from a separate public demo and illustrate the counting rule. The demo is small and selected for study. The dashboard’s reference ranges are set by hand and its sample tiers use opportunity counts alone. Estimating bluff profitability requires ranges, sizing and later-street outcomes.</p>
+<a href="methodology.html">Definitions &amp; audit status ↗</a></section></div></main>
+<footer><div class="shell">CoinPoker PLO Population Analyzer · Completed hand histories</div></footer>
+<script>function openHand(){const el=document.getElementById(location.hash.slice(1));if(el?.matches('details')){el.open=true;el.scrollIntoView();}}
+window.addEventListener('hashchange',openHand);document.addEventListener('click',e=>{const a=e.target.closest('a');if(a?.hash===location.hash)openHand();});if(location.hash)openHand();</script>
+</body></html>

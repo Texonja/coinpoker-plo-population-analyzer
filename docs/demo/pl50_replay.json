@@ -1,0 +1,464 @@
+{
+  "source": "https://github.com/Texonja/plo-hero-leak-finder/blob/16d505268c4229ac77bce764a97d499dbf9dd8cd/demo/CoinPoker-HeroDemo.txt",
+  "sha256_lf": "9cfc4ce9b46d7b9d8760293dc02fb87ac1c4e7f1ba421566808070b6ed648295",
+  "raw_hands": 320,
+  "pl50_hands": 116,
+  "by_ante": {
+    "0.00": 7,
+    "0.08": 109
+  },
+  "settlement_counts": {
+    "reconciled": 114,
+    "mismatch": 2
+  },
+  "hands": [
+    {
+      "id": "9000002857",
+      "first_line": 4443,
+      "last_line": 4472,
+      "pot": "srp",
+      "pfa": "UTG",
+      "board": [
+        "8d",
+        "As",
+        "5c"
+      ],
+      "trace": [
+        {
+          "line": 4469,
+          "position": "UTG",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 4.65
+        },
+        {
+          "line": 4470,
+          "position": "BTN",
+          "hero": true,
+          "action": "bet",
+          "text": "bets ₮4.65",
+          "pot_before": 4.65
+        },
+        {
+          "line": 4471,
+          "position": "UTG",
+          "hero": false,
+          "action": "raise",
+          "text": "raises ₮13.95 to ₮18.60",
+          "pot_before": 9.3
+        },
+        {
+          "line": 4472,
+          "position": "BTN",
+          "hero": true,
+          "action": "fold",
+          "text": "folds",
+          "pot_before": 27.9
+        }
+      ],
+      "decisions": [
+        {
+          "node": "OOP_RESPONSE_VS_IP_FLOP_STAB_AFTER_MISSED_CB",
+          "action": "raise",
+          "line": 4471
+        }
+      ]
+    },
+    {
+      "id": "9000002879",
+      "first_line": 5402,
+      "last_line": 5435,
+      "pot": "srp",
+      "pfa": "SB",
+      "board": [
+        "8d",
+        "Qc",
+        "Kd"
+      ],
+      "trace": [
+        {
+          "line": 5433,
+          "position": "SB",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 4.98
+        },
+        {
+          "line": 5434,
+          "position": "HJ",
+          "hero": false,
+          "action": "bet",
+          "text": "bets ₮2.49",
+          "pot_before": 4.98
+        },
+        {
+          "line": 5435,
+          "position": "SB",
+          "hero": false,
+          "action": "fold",
+          "text": "folds",
+          "pot_before": 7.47
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "bet",
+          "line": 5434
+        },
+        {
+          "node": "OOP_RESPONSE_VS_IP_FLOP_STAB_AFTER_MISSED_CB",
+          "action": "fold",
+          "line": 5435
+        }
+      ]
+    },
+    {
+      "id": "9000004212",
+      "first_line": 6822,
+      "last_line": 6855,
+      "pot": "3bet",
+      "pfa": "SB",
+      "board": [
+        "2d",
+        "2c",
+        "6s"
+      ],
+      "trace": [
+        {
+          "line": 6853,
+          "position": "SB",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 6.48
+        },
+        {
+          "line": 6854,
+          "position": "BTN",
+          "hero": true,
+          "action": "bet",
+          "text": "bets ₮2.14",
+          "pot_before": 6.48
+        },
+        {
+          "line": 6855,
+          "position": "SB",
+          "hero": false,
+          "action": "fold",
+          "text": "folds",
+          "pot_before": 8.62
+        }
+      ],
+      "decisions": [
+        {
+          "node": "OOP_RESPONSE_VS_IP_FLOP_STAB_AFTER_MISSED_CB",
+          "action": "fold",
+          "line": 6855
+        }
+      ]
+    },
+    {
+      "id": "9000005614",
+      "first_line": 8157,
+      "last_line": 8192,
+      "pot": "3bet",
+      "pfa": "BB",
+      "board": [
+        "Js",
+        "Qs",
+        "9s"
+      ],
+      "trace": [
+        {
+          "line": 8190,
+          "position": "BB",
+          "hero": true,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 22.98
+        },
+        {
+          "line": 8191,
+          "position": "HJ",
+          "hero": false,
+          "action": "bet",
+          "text": "bets ₮7.58",
+          "pot_before": 22.98
+        },
+        {
+          "line": 8192,
+          "position": "BB",
+          "hero": true,
+          "action": "call",
+          "text": "calls ₮7.58",
+          "pot_before": 30.56
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "bet",
+          "line": 8191
+        }
+      ]
+    },
+    {
+      "id": "9000005641",
+      "first_line": 9202,
+      "last_line": 9230,
+      "pot": "srp",
+      "pfa": "SB",
+      "board": [
+        "9c",
+        "7c",
+        "5s"
+      ],
+      "trace": [
+        {
+          "line": 9229,
+          "position": "SB",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 4.9
+        },
+        {
+          "line": 9230,
+          "position": "UTG",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 4.9
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "check",
+          "line": 9230
+        }
+      ]
+    },
+    {
+      "id": "9000008602",
+      "first_line": 12821,
+      "last_line": 12853,
+      "pot": "3bet",
+      "pfa": "SB",
+      "board": [
+        "4c",
+        "Kh",
+        "4s"
+      ],
+      "trace": [
+        {
+          "line": 12852,
+          "position": "SB",
+          "hero": true,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 12.48
+        },
+        {
+          "line": 12853,
+          "position": "HJ",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 12.48
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "check",
+          "line": 12853
+        }
+      ]
+    },
+    {
+      "id": "9000008611",
+      "first_line": 13121,
+      "last_line": 13153,
+      "pot": "srp",
+      "pfa": "SB",
+      "board": [
+        "8h",
+        "Qs",
+        "Ts"
+      ],
+      "trace": [
+        {
+          "line": 13151,
+          "position": "SB",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 3.48
+        },
+        {
+          "line": 13152,
+          "position": "BB",
+          "hero": false,
+          "action": "bet",
+          "text": "bets ₮1.74",
+          "pot_before": 3.48
+        },
+        {
+          "line": 13153,
+          "position": "SB",
+          "hero": false,
+          "action": "call",
+          "text": "calls ₮1.74",
+          "pot_before": 5.22
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "bet",
+          "line": 13152
+        },
+        {
+          "node": "OOP_RESPONSE_VS_IP_FLOP_STAB_AFTER_MISSED_CB",
+          "action": "call",
+          "line": 13153
+        }
+      ]
+    },
+    {
+      "id": "9000008616",
+      "first_line": 13268,
+      "last_line": 13300,
+      "pot": "srp",
+      "pfa": "UTG",
+      "board": [
+        "3s",
+        "4d",
+        "9d"
+      ],
+      "trace": [
+        {
+          "line": 13298,
+          "position": "UTG",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 4.73
+        },
+        {
+          "line": 13299,
+          "position": "BTN",
+          "hero": false,
+          "action": "bet",
+          "text": "bets ₮3.75",
+          "pot_before": 4.73
+        },
+        {
+          "line": 13300,
+          "position": "UTG",
+          "hero": false,
+          "action": "call",
+          "text": "calls ₮3.75",
+          "pot_before": 8.48
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "bet",
+          "line": 13299
+        },
+        {
+          "node": "OOP_RESPONSE_VS_IP_FLOP_STAB_AFTER_MISSED_CB",
+          "action": "call",
+          "line": 13300
+        }
+      ]
+    },
+    {
+      "id": "9000009970",
+      "first_line": 13808,
+      "last_line": 13841,
+      "pot": "3bet",
+      "pfa": "CO",
+      "board": [
+        "Js",
+        "8c",
+        "Qh"
+      ],
+      "trace": [
+        {
+          "line": 13840,
+          "position": "HJ",
+          "hero": true,
+          "action": "bet",
+          "text": "bets ₮17.98",
+          "pot_before": 18.48
+        },
+        {
+          "line": 13841,
+          "position": "CO",
+          "hero": false,
+          "action": "fold",
+          "text": "folds",
+          "pot_before": 36.46
+        }
+      ],
+      "decisions": []
+    },
+    {
+      "id": "9000009993",
+      "first_line": 14933,
+      "last_line": 14965,
+      "pot": "srp",
+      "pfa": "UTG",
+      "board": [
+        "5s",
+        "8h",
+        "Td"
+      ],
+      "trace": [
+        {
+          "line": 14963,
+          "position": "UTG",
+          "hero": false,
+          "action": "check",
+          "text": "checks",
+          "pot_before": 4.73
+        },
+        {
+          "line": 14964,
+          "position": "BTN",
+          "hero": false,
+          "action": "bet",
+          "text": "bets ₮3.55",
+          "pot_before": 4.73
+        },
+        {
+          "line": 14965,
+          "position": "UTG",
+          "hero": false,
+          "action": "fold",
+          "text": "folds",
+          "pot_before": 8.28
+        }
+      ],
+      "decisions": [
+        {
+          "node": "BET_IP_VS_MISSED_FLOP_CB",
+          "action": "bet",
+          "line": 14964
+        },
+        {
+          "node": "OOP_RESPONSE_VS_IP_FLOP_STAB_AFTER_MISSED_CB",
+          "action": "fold",
+          "line": 14965
+        }
+      ]
+    }
+  ]
+}

@@ -35,27 +35,28 @@ from typing import Any, Dict, List, Optional, Tuple
 
 try:
     from . import __version__
-    from .common import RANK_VALUE, assign_positions, parse_header, split_hand_history
+    from .common import RANK_VALUE, assign_positions, parse_header, split_hand_history, suited_ace, straight_window, unique_hand_blocks, valid_cards, validate_cli_filters, save_run_manifest
     from . import report_ui
 except ImportError:  # Supports direct execution during local debugging.
-    __version__ = "1.1.0"
-    from common import RANK_VALUE, assign_positions, parse_header, split_hand_history
+    __version__ = "1.2.0"
+    from common import RANK_VALUE, assign_positions, parse_header, split_hand_history, suited_ace, straight_window, unique_hand_blocks, valid_cards, validate_cli_filters, save_run_manifest
     import report_ui
 
-SEAT_RE = re.compile(r"Seat (\d+): (.+?) \(₮([0-9.]+) in chips\)")
+SEAT_RE = re.compile(r"Seat (\d+): (.+?) \(₮([0-9]+(?:\.[0-9]+)?) in chips\)")
 BUTTON_RE = re.compile(r"Seat #(\d+) is the button")
-RAISE_RE = re.compile(r"^(.+?): raises ₮([0-9.]+) to ₮([0-9.]+)")
-CALL_RE = re.compile(r"^(.+?): calls ₮([0-9.]+)")
-ALLIN_RE = re.compile(r"^(.+?): ALLIN ₮([0-9.]+)")
-POST_SB_RE = re.compile(r"^(.+?): posts small blind ₮([0-9.]+)")
-POST_BB_RE = re.compile(r"^(.+?): posts big blind ₮([0-9.]+)")
-POST_ANTE_RE = re.compile(r"^(.+?): posts ante ₮([0-9.]+)")
-STRADDLE_RE = re.compile(r"^(.+?): STRADDLE ₮([0-9.]+)", re.I)
+RAISE_RE = re.compile(r"^(.+?): raises ₮([0-9]+(?:\.[0-9]+)?) to ₮([0-9]+(?:\.[0-9]+)?)")
+CALL_RE = re.compile(r"^(.+?): calls ₮([0-9]+(?:\.[0-9]+)?)")
+ALLIN_RE = re.compile(r"^(.+?): ALLIN ₮([0-9]+(?:\.[0-9]+)?)")
+POST_SB_RE = re.compile(r"^(.+?): posts small blind ₮([0-9]+(?:\.[0-9]+)?)")
+POST_BB_RE = re.compile(r"^(.+?): posts big blind ₮([0-9]+(?:\.[0-9]+)?)")
+POST_ANTE_RE = re.compile(r"^(.+?): posts ante ₮([0-9]+(?:\.[0-9]+)?)")
+STRADDLE_RE = re.compile(r"^(.+?): STRADDLE ₮([0-9]+(?:\.[0-9]+)?)", re.I)
 FOLD_RE = re.compile(r"^(.+?): folds")
 STREET_RE = re.compile(r"^\*\*\* (?:FIRST |SECOND |THIRD )?(FLOP|TURN|RIVER) \*\*")
 
 # Robust known-card patterns. CoinPoker exports can vary slightly between full action and summary lines.
 KNOWN_CARD_PATTERNS = [
+    re.compile(r"^Dealt to (.+?)\s+\[([^\]]+)\]"),
     re.compile(r"^(.+?):\s+shows\s+\[([^\]]+)\]", re.I),
     re.compile(r"^(.+?):\s+showed\s+\[([^\]]+)\]", re.I),
     re.compile(r"^(.+?):\s+mucks\s+\[([^\]]+)\]", re.I),
@@ -66,7 +67,7 @@ KNOWN_CARD_PATTERNS = [
 
 
 def parse_cards(card_text: str) -> List[str]:
-    return [c.strip() for c in card_text.split() if re.match(r"^[2-9TJQKA][cdhsCDHS]$", c.strip())]
+    return [token[0].upper() + token[1:].lower() for token in card_text.split()]
 
 
 def classify_known_hand(cards: List[str]) -> Dict[str, Any]:
@@ -79,10 +80,7 @@ def classify_known_hand(cards: List[str]) -> Dict[str, Any]:
     pairs = sum(1 for v in rank_counts.values() if v == 2)
     high = sum(1 for v in vals if v >= 11)
     broadway = sum(1 for v in vals if v >= 10)
-    ace = "A" in ranks
-    best_window = 0
-    for low in range(2, 11):
-        best_window = max(best_window, sum(1 for v in uniq if low <= v <= low + 4))
+    best_window = straight_window(uniq)
     double_suited = sum(1 for v in suit_counts.values() if v >= 2) >= 2
     if rank_counts.get("A", 0) >= 2:
         hand_class = "AAxx"
@@ -94,16 +92,17 @@ def classify_known_hand(cards: List[str]) -> Dict[str, Any]:
         hand_class = "rundown"
     elif broadway >= 3:
         hand_class = "broadway"
-    elif ace and max(suit_counts.values() or [0]) >= 2:
+    elif suited_ace(cards):
         hand_class = "suited_ace"
     else:
         hand_class = "other"
     return {
         "cards": " ".join(cards),
         "card_count": len(cards),
-        "is_aaxx": rank_counts.get("A", 0) >= 2 and len(cards) == 4,
+        "is_aaxx": rank_counts.get("A", 0) >= 2,
         "hand_class": hand_class,
         "double_suited": double_suited,
+        "suited_ace": suited_ace(cards),
         "pairs": pairs,
         "broadways": broadway,
         "high_cards": high,
@@ -111,19 +110,28 @@ def classify_known_hand(cards: List[str]) -> Dict[str, Any]:
     }
 
 
-def extract_known_cards(lines: List[str], seat_names: set[str]) -> Dict[str, List[str]]:
+def extract_known_cards(lines: List[str], seat_names: set[str], expected_cards: int = 4) -> Dict[str, List[str]]:
     known: Dict[str, List[str]] = {}
+    conflicts = set()
+    board_cards = set()
     for line in lines:
+        if STREET_RE.match(line) or line.startswith("Board ["):
+            for group in re.findall(r"\[([^\]]+)\]", line):
+                board_cards.update(parse_cards(group))
         for pat in KNOWN_CARD_PATTERNS:
             m = pat.match(line)
             if not m:
                 continue
             player = m.group(1).strip()
             cards = parse_cards(m.group(2))
-            if player in seat_names and len(cards) >= 4:
-                known[player] = cards[:4]
+            if player in seat_names and valid_cards(cards, expected_cards):
+                if player in known and set(known[player]) != set(cards):
+                    conflicts.add(player)
+                known[player] = cards
             break
-    return known
+    owners = collections.Counter(card for holding in known.values() for card in holding)
+    return {p: cards for p, cards in known.items() if p not in conflicts
+            and not any(c in board_cards or owners[c] > 1 for c in cards)}
 
 
 def pass_filters(meta: Dict[str, Any], args: argparse.Namespace) -> bool:
@@ -155,7 +163,7 @@ def pass_filters(meta: Dict[str, Any], args: argparse.Namespace) -> bool:
         if meta.get("stake_label", "").upper() not in allowed:
             return False
 
-    date_part = str(meta.get("dt", "")).split()[0].replace("/", "-")
+    date_part = meta["date"]
     if args.date_from and date_part < args.date_from:
         return False
     if args.date_to and date_part > args.date_to:
@@ -194,85 +202,69 @@ def analyze_hand(block: str, args: argparse.Namespace) -> Tuple[Optional[str], L
     button_match = BUTTON_RE.search(block)
     button_seat = int(button_match.group(1)) if button_match else None
     positions = assign_positions(seats, button_seat)
-    known_cards = extract_known_cards(lines, set(seats.values()))
+    known_cards = extract_known_cards(lines, set(seats.values()), meta.get("plo_cards") or 4)
 
-    street = "PREFLOP"
     street_contrib: Dict[str, float] = collections.defaultdict(float)
+    closed_players = set()
     current_to_call = 0.0
     raise_count = 0
     preflop_sequence: List[str] = []
     fourbet_rows: List[Dict[str, Any]] = []
 
     for line in lines[1:]:
-        if STREET_RE.match(line):
-            street = "POSTFLOP"
+        line = line.rstrip()
+        if STREET_RE.match(line) or line.startswith(("*** SHOWDOWN", "*** SUMMARY")):
             break
-        if street != "PREFLOP":
+        actor, sep, action = line.partition(": ")
+        if not sep or actor not in stacks:
+            if any(regex.fullmatch(line) for regex in (RAISE_RE, CALL_RE, ALLIN_RE, FOLD_RE)):
+                return "unknown_preflop_actor", []
             continue
-
-        m = POST_SB_RE.match(line) or POST_BB_RE.match(line) or POST_ANTE_RE.match(line) or STRADDLE_RE.match(line)
-        if m:
-            player = m.group(1)
-            amount = float(m.group(2))
-            if POST_ANTE_RE.match(line):
-                pass
-            else:
-                street_contrib[player] += amount
-                current_to_call = max(current_to_call, street_contrib[player])
+        post = POST_SB_RE.fullmatch(line) or POST_BB_RE.fullmatch(line) or STRADDLE_RE.fullmatch(line)
+        if post:
+            street_contrib[actor] += float(post[2])
+            current_to_call = max(current_to_call, street_contrib[actor])
             continue
-
-        m = CALL_RE.match(line)
-        if m:
-            player = m.group(1)
-            amount = float(m.group(2))
-            street_contrib[player] += amount
-            preflop_sequence.append(f"{player}:call_to_{current_to_call:.4g}")
+        if POST_ANTE_RE.fullmatch(line) or re.fullmatch(r"RETURN ₮[0-9]+(?:\.[0-9]+)?", action):
             continue
-
-        m = FOLD_RE.match(line)
-        if m:
-            player = m.group(1)
-            preflop_sequence.append(f"{player}:fold")
+        if actor in closed_players:
+            return "action_after_fold_or_allin", []
+        if action == "folds":
+            closed_players.add(actor)
+            preflop_sequence.append(f"{actor}:fold")
             continue
-
-        m = RAISE_RE.match(line)
-        if m:
-            player = m.group(1)
-            total_to = float(m.group(3))
-            # Raise only if it increases current bet.
-            if total_to > current_to_call + 1e-9:
-                raise_count += 1
-                action_name = {1: "open", 2: "3bet", 3: "4bet"}.get(raise_count, f"{raise_count+1}bet")
-                preflop_sequence.append(f"{player}:{action_name}_to_{total_to:.4g}")
-                if raise_count == 3:
-                    row = build_fourbet_row(meta, player, stacks, positions, bb, known_cards, action_name, total_to, args, "raise")
-                    if row:
-                        row["preflop_sequence"] = " | ".join(preflop_sequence)
-                        fourbet_rows.append(row)
-                street_contrib[player] = total_to
-                current_to_call = total_to
+        if action == "checks" and abs(street_contrib[actor] - current_to_call) < 1e-9:
+            preflop_sequence.append(f"{actor}:check")
             continue
-
-        m = ALLIN_RE.match(line)
-        if m:
-            player = m.group(1)
-            amount = float(m.group(2))
-            new_total = street_contrib[player] + amount
-            if new_total > current_to_call + 1e-9:
-                raise_count += 1
-                action_name = {1: "open_allin", 2: "3bet_allin", 3: "4bet_allin"}.get(raise_count, f"{raise_count+1}bet_allin")
-                preflop_sequence.append(f"{player}:{action_name}_to_{new_total:.4g}")
-                if raise_count == 3:
-                    row = build_fourbet_row(meta, player, stacks, positions, bb, known_cards, action_name, new_total, args, "allin_raise")
-                    if row:
-                        row["preflop_sequence"] = " | ".join(preflop_sequence)
-                        fourbet_rows.append(row)
-                street_contrib[player] = new_total
-                current_to_call = max(current_to_call, new_total)
-            else:
-                street_contrib[player] = new_total
-                preflop_sequence.append(f"{player}:allin_call_to_{new_total:.4g}")
+        call = CALL_RE.fullmatch(line)
+        raise_to = RAISE_RE.fullmatch(line)
+        all_in = ALLIN_RE.fullmatch(line)
+        if not (call or raise_to or all_in):
+            return "unrecognized_preflop_action", []
+        target = float(raise_to[3]) if raise_to else street_contrib[actor] + float((call or all_in)[2])
+        if target <= street_contrib[actor] or (call and target > current_to_call + 1e-9):
+            return "invalid_preflop_amount", []
+        if all_in:
+            closed_players.add(actor)
+        street_contrib[actor] = target
+        if target <= current_to_call + 1e-9:
+            if raise_to:
+                return "invalid_raise_to", []
+            label = "allin_call" if all_in else "call"
+            preflop_sequence.append(f"{actor}:{label}_to_{target:.4g}")
             continue
+        current_to_call = target
+        raise_count += 1
+        action_name = "open" if raise_count == 1 else f"{raise_count + 1}bet"
+        if all_in:
+            action_name += "_allin"
+        preflop_sequence.append(f"{actor}:{action_name}_to_{target:.4g}")
+        if raise_count == 3:
+            row = build_fourbet_row(meta, actor, stacks, positions, bb, known_cards, action_name, target,
+                                    args, "allin_raise" if all_in else "raise")
+            if row:
+                row["preflop_sequence"] = " | ".join(preflop_sequence)
+                fourbet_rows.append(row)
 
     return None, fourbet_rows
 
@@ -302,6 +294,7 @@ def build_fourbet_row(
         "is_aaxx": "",
         "hand_class": "unknown",
         "double_suited": "",
+        "suited_ace": "",
         "pairs": "",
         "broadways": "",
         "high_cards": "",
@@ -326,12 +319,16 @@ def build_fourbet_row(
     }
 
 
-def write_csv(rows: List[Dict[str, Any]], path: Path) -> None:
+SUMMARY_COLUMNS = ("stake_label fourbettor_position total_4bets_stack_filtered known_4bettor_hands known_rate_pct "
+                   "known_AAxx AAxx_pct_of_known unknown_4bettor_hands").split()
+
+
+def write_csv(rows: List[Dict[str, Any]], path: Path, empty_columns=()) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    if not rows:
+    if not rows and not empty_columns:
         path.write_text("", encoding="utf-8")
         return
-    keys: List[str] = []
+    keys: List[str] = list(empty_columns) if not rows else []
     for row in rows:
         for k in row.keys():
             if k not in keys:
@@ -432,7 +429,7 @@ def plot_fourbet_summary(outdir: Path, summary_rows: List[Dict[str, Any]], class
 
 def generate_fourbet_dashboard(outdir: Path, summary_rows: List[Dict[str, Any]], rows: List[Dict[str, Any]], known_rows: List[Dict[str, Any]], chart_paths: List[str], args: argparse.Namespace) -> None:
     report_ui.fourbet_report(outdir, summary_rows, make_hand_class_summary(known_rows),
-                            chart_paths, args.min_stack_bb, args.stake_filter)
+                            chart_paths, args.min_stack_bb, args.stake_filter, include_hero=args.include_hero)
 
 
 def pct(num: int, den: int) -> str:
@@ -488,7 +485,7 @@ def make_md(summary_rows: List[Dict[str, Any]], rows: List[Dict[str, Any]], args
     md.append("")
     md.append("## Headline")
     md.append("")
-    md.append(f"- Stack-filtered non-Hero 4-bets found: **{len(rows):,}**")
+    md.append(f"- Stack-filtered 4-bets found: **{len(rows):,}**")
     md.append(f"- Known/shown 4-bettor hands: **{len(known):,}**")
     md.append(f"- AAxx among known 4-bettor hands: **{len(aaxx):,} / {len(known):,} ({pct(len(aaxx), len(known)) or 'n/a'})**")
     md.append("")
@@ -531,6 +528,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Optional[List[str]] = None) -> None:
     p = build_parser()
     args = p.parse_args(argv)
+    validate_cli_filters(p, args)
 
     input_path = Path(args.input)
     if not input_path.is_file():
@@ -539,7 +537,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     blocks = split_hand_history(text)
     rows: List[Dict[str, Any]] = []
     parse_errors = collections.Counter()
-    for block in blocks:
+    unique, duplicate_counts = unique_hand_blocks(blocks)
+    for block in unique:
         err, hand_rows = analyze_hand(block, args)
         if err:
             parse_errors[err] += 1
@@ -551,10 +550,16 @@ def main(argv: Optional[List[str]] = None) -> None:
     summary_rows = summarize(rows)
     exported_rows = [export_detail_row(row, args.include_identifiers) for row in rows]
     exported_known_rows = [export_detail_row(row, args.include_identifiers) for row in known_rows]
-    write_csv(exported_rows, outdir / "fourbet_all.csv")
-    write_csv(exported_known_rows, outdir / "fourbet_known_cards.csv")
-    write_csv(summary_rows, outdir / "fourbet_summary.csv")
-    (outdir / "filters_applied.json").write_text(json.dumps({
+    detail_columns = ("hand_id dt stake_label desc bb fourbettor_position fourbettor_start_stack fourbettor_start_stack_bb "
+                      "fourbet_action fourbet_action_type fourbet_total_to fourbet_total_to_bb known_cards cards card_count "
+                      "is_aaxx hand_class double_suited suited_ace pairs broadways high_cards connected_window").split()
+    if args.include_identifiers:
+        detail_columns.extend(["fourbettor", "preflop_sequence"])
+    write_csv(exported_rows, outdir / "fourbet_all.csv", detail_columns)
+    write_csv(exported_known_rows, outdir / "fourbet_known_cards.csv", detail_columns)
+    write_csv(summary_rows, outdir / "fourbet_summary.csv", SUMMARY_COLUMNS)
+    filters = {
+        "analyzer_version": __version__,
         "input": input_path.name,
         "hero": args.hero,
         "include_hero": args.include_hero,
@@ -567,16 +572,19 @@ def main(argv: Optional[List[str]] = None) -> None:
         "date_from": args.date_from or "none",
         "date_to": args.date_to or "none",
         "raw_hands": len(blocks),
+        **duplicate_counts,
         "stack_filtered_4bets": len(rows),
         "known_4bettor_hands": len(known_rows),
         "parse_errors": dict(parse_errors),
-    }, indent=2, ensure_ascii=False), encoding="utf-8")
+    }
     md = make_md(summary_rows, rows, args)
     (outdir / "fourbet_report.md").write_text(md, encoding="utf-8")
     chart_paths: List[str] = []
     if not args.no_charts:
         chart_paths = generate_fourbet_charts(outdir, summary_rows, known_rows)
     generate_fourbet_dashboard(outdir, summary_rows, rows, known_rows, chart_paths, args)
+    save_run_manifest(outdir, "fourbet_filters.json", filters, [Path(p) for p in chart_paths],
+                      ("charts/aaxx_by_position.png", "charts/hand_class_composition.png"))
 
     known_aaxx = sum(1 for r in known_rows if r.get("is_aaxx") is True)
     print("Done.")

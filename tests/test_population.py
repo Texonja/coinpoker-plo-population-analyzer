@@ -44,8 +44,8 @@ class PopulationTests(unittest.TestCase):
         self.assertEqual(positions, {"Button": "BTN", "SmallBlind": "SB", "BigBlind": "BB"})
 
     def test_board_and_starting_hand_classification(self):
-        self.assertEqual(population.board_bucket(["As", "7h", "2c"]), "dry")
-        self.assertEqual(population.board_bucket(["As", "Ah", "2c"]), "paired")
+        self.assertEqual(population.board_bucket(["As", "7h", "2c"]), "unpaired / rainbow / 2-in-window")
+        self.assertEqual(population.board_bucket(["As", "Ah", "2c"]), "paired / rainbow / 2-in-window")
         self.assertEqual(population.classify_starting_hand(["As", "Ah", "Kd", "Qd"])["hand_class"], "AAxx")
 
     def test_committed_benchmarks_match_runtime_defaults(self):
@@ -108,8 +108,9 @@ class PopulationTests(unittest.TestCase):
         blocks = population.split_hand_history(FIXTURE.read_text(encoding="utf-8"))
         hand = population.parse_hand(blocks[1], hero="Hero")
         self.assertIsNotNone(hand)
-        records = population.extract_required_pool_records(hand, population_args())
-        self.assertTrue(all(record.get("actor") != "Hero" for record in records))
+        records = population.extract_required_pool_records(hand, population_args(debug_players=True))
+        self.assertTrue(records)
+        self.assertTrue(all(record["actor"] != "Hero" for record in records))
 
 
 if __name__ == "__main__":
