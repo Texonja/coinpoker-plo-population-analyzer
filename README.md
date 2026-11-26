@@ -43,7 +43,3 @@ plo-fourbet --input examples/synthetic_hands.txt --outdir reports/fourbet --min-
 Open `pool_dashboard.html` or `fourbet_dashboard.html` in the output folder. The CSV files contain the breakdowns. `filters_applied.json` records the run settings and quality checks. For the public demo export, use `--hero HeroDemo --stake-filter PL50`.
 
 Run the regression tests with `python -m unittest discover -s tests -v`. Rebuild the HTML reports and GitHub case study with `python tools/refresh_demo.py`. [Methodology](docs/METHODOLOGY.md) · [Data handling](docs/DATA_PRIVACY.md)
-
-## AI assistance
-
-I defined the poker questions, rules and checks, and reviewed sample hands against the source. I used AI to help write the code and edit the documentation.
